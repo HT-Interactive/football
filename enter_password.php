@@ -68,7 +68,7 @@
 
   } else { // Request not from login form so...
 
-    die();
+    die("Request not from login");
 
   }
 
