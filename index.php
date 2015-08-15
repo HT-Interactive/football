@@ -109,7 +109,7 @@ function checkName(str) {
       echo "<form action=\"login.php\" method=\"post\" class=\"loginTable\">
       <label for=\"username\">Email Address:</label>
       <input type=\"text\" name=\"username\" size=\"12\" onkeyup=\"checkName(this.value)\" />
-      <input id=\"registerButton\" type=\"submit\" name=\"register\" value=\"Register\" class=\"login\" style=\"visibility: hidden;\" />
+      <input id=\"registerButton\" type=\"submit\" name=\"register\" value=\"Register\" class=\"login\" style=\"visibility: visible;\" />
       <span id=\"loginButton\">
       <label for=\"password\">Password:</label>
       <input type=\"password\" name=\"password\" size=\"12\" />
