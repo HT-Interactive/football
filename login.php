@@ -8,73 +8,64 @@
 // die();
 // Evose Login Script--
 
-  if(isset($_POST['login'])) {
+  // Get DB connect info
+  require("mysql.php");
+
+  if(isset($_POST['register'])) {
+      $username=$_REQUEST['username'];
+
+      $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?register=".$username;
+      header("Location: http://".$goTo);
+      exit;
+
+  } elseif(isset($_REQUEST['login'])) {
 
   // Get Form Variables
-    $username=$_POST['username'];
-    $password=$_POST['password'];
+    $username=$_REQUEST['username'];
+    $password=$_REQUEST['password'];
     $time = time()+3600;
 
-    if(isset($_COOKIE['cookies'])) { // Cookies Enabled so continue
+ // Select proper user from table
+    $user_result = mysqli_query($db, "SELECT * FROM users WHERE user_name='$username'");
 
-    // Get DB connect info
-      require("mysql.php");
+    if($this_user = mysqli_fetch_array($user_result)) { // User name exists so continue
+      extract($this_user,EXTR_PREFIX_ALL,"this");
+    // Check encrypted password by seeding crypt with original pass (ref 1)
+      
+      if (hash_equals($this_user_password, crypt($password, $this_user_password))) { // Password ok so continue
 
-   // Select proper user from table
-      $user_result = mysql_query("SELECT * FROM users WHERE UserName='$username'",$db);
+      // Set session id to unique value to prevent piggy-backing
+        $id = uniqid("");
+        session_id($id);
 
-      if($this_user = mysql_fetch_array($user_result)) { // User name exists so continue
-        extract($this_user,EXTR_PREFIX_ALL,"this");
-      // Check encrypted password by seeding crypt with original pass (ref 1)
-        
-        if(is_null($this_UserPassword)) {
-          $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?tab=home&register=".$username;
-          header("Location: http://".$goTo);
-          exit;
-        }
-        if(crypt($password,$this_UserPassword) == $this_UserPassword) { // Password ok so continue
+      // Continue session
+        session_start();
 
-        // Set session id to unique value to prevent piggy-backing
-          $id = uniqid("");
-          session_id($id);
+      // Save authenticated name-pass in cookie
+        // header("Set-Cookie: id=$id; path=/;");
+        setcookie("id",$id,time()+60*60*24*365);
+        // header("Set-Cookie: username=$username; path=/;");
+        setcookie("username",$username,time()+60*60*24*365);
+        setcookie("userid",$this_user_id,time()+60*60*24*365);
+        setcookie("displayname",$this_user_display_name,time()+60*60*24*365);
 
-        // Continue session
-          session_start();
+      // Point browser to user page (ref 1)
+        $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php";
+        header("Location: http://".$goTo);
+        exit;
 
-        // Save authenticated name-pass in cookie
-          // header("Set-Cookie: id=$id; path=/;");
-          setcookie("id",$id,time()+60*60*24*365);
-          // header("Set-Cookie: username=$username; path=/;");
-          setcookie("username",$username,time()+60*60*24*365);
-          setcookie("userid",$this_UserID,time()+60*60*24*365);
-          setcookie("usertype",$this_UsertypeID,time()+60*60*24*365);
+      } else { // Bad password
 
-        // Point browser to user page (ref 1)
-          $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php";
-          header("Location: http://".$goTo);
-          exit;
-
-        } else { // Bad password
-
-          $error="InvalidPassword";
-          $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?message=".$error;
-          header("Location: http://".$goTo);
-          exit;
-
-        }
-
-      } else { // User name not in DB
-
-        $error="InvalidUsername";
+        $error="InvalidPassword";
         $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?message=".$error;
         header("Location: http://".$goTo);
         exit;
 
       }
 
-   } else { // Cookies aren't enabled
+    } else { // User name not in DB
 
-      $error="Cookies";
+      $error="InvalidUsername";
       $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?message=".$error;
       header("Location: http://".$goTo);
       exit;
