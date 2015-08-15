@@ -1,13 +1,13 @@
 <?php //
     
 
-  if(isset($_POST['continue'])) {
+  if(isset($_REQUEST['continue'])) {
 
   // Get Form Variables
-    $username=$_POST['username'];
-    $password=$_POST['password'];
-    $password2=$_POST['password2'];
-    $displayname=$_POST['displayname'];
+    $username=$_REQUEST['username'];
+    $password=$_REQUEST['password'];
+    $password2=$_REQUEST['password2'];
+    $displayname=$_REQUEST['displayname'];
     if($password2==$password) {
 
     } else {

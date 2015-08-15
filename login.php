@@ -17,7 +17,7 @@
   // Get DB connect info
   require("mysql.php");
 
-  if(isset($_POST['register'])) {
+  if(isset($_REQUEST['register'])) {
       $username=$_REQUEST['username'];
 
       $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?register=".$username;
