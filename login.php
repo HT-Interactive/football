@@ -8,6 +8,12 @@
 // die();
 // Evose Login Script--
 
+  if(!isset($_COOKIE['cookies'])) {
+    $error="Cookies";
+    $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?message=".$error;
+    header("Location: http://".$goTo);
+    exit;
+  } 
   // Get DB connect info
   require("mysql.php");
 
