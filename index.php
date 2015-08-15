@@ -3,6 +3,8 @@
 // Load DB
   require("mysql.php");
 
+  date_default_timezone_set('America/New_York');
+
 // Start Session; if first visit test for cookies
   if(!isset($_COOKIE['cookies'])) {
     session_start();
@@ -16,6 +18,7 @@
   if(isset($_COOKIE['username'])) {
 
       $this_username = $_COOKIE['username']; 
+      $this_userid = $_COOKIE['userid']; 
       $this_displayname = $_COOKIE['displayname'];
       $user_result = mysqli_query($db,"SELECT * FROM users WHERE user_name='$this_username'");
       $this_user = mysqli_fetch_array($user_result);
@@ -78,6 +81,45 @@ function checkName(str) {
     }
 }
 
+function pickTeam(element,u,g,w) {
+
+  // alert(w);
+  //element.style.color = "green";
+  //home_color = document.getElementById(g+"_home").style.color;
+  //away_color = document.getElementById(g+"_away").style.color;
+  if(element.id == g+"_home") { // user picked home team
+    document.getElementById(g+"_home").style.color = "green";
+    document.getElementById(g+"_away").style.color = "black";
+  } else { // user picked away team
+    document.getElementById(g+"_away").style.color = "green";
+    document.getElementById(g+"_home").style.color = "black";
+  }
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+
+          /*
+          if (xmlhttp.responseText == 0) {
+              
+              document.getElementById("registerButton").style.visibility = "visible";
+              document.getElementById("loginButton").style.visibility = "hidden";
+          } else {
+              
+              document.getElementById("registerButton").style.visibility = "hidden";
+              document.getElementById("loginButton").style.visibility = "visible";
+          }
+          */
+      }
+  }
+  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&winner=" + w, true);
+  xmlhttp.send();
+
+
+
+}
+
 
 </script>
 </head>
@@ -119,10 +161,9 @@ function checkName(str) {
     
   }
    
-
-
-
 ?>
+
+<p>Response: <span id="txtHint"></span></p>
 
 </body>
 </html>
