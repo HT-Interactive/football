@@ -7,8 +7,7 @@
     echo "Failed to connect to MySQL: " . mysqli_connect_error();
   }
 
-  $db_nfl = pg_connect("host=173.254.28.69 dbname=evosecom_nfldb user=evosecom_nfl password=jmev0203");
-  if(!$db_nfl) { //must be on evose, so try localhost
+  if(!$db_nfl = pg_connect("host=173.254.28.69 dbname=evosecom_nfldb user=evosecom_nfl password=jmev0203")) { //must be on evose, so try localhost
     $db_nfl = pg_connect("host=localhost dbname=evosecom_nfldb user=evosecom_nfl password=jmev0203")
       or die('Could not connect: ' . pg_last_error()); //something is wrong
   }
