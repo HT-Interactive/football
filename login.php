@@ -39,7 +39,7 @@
     // Check encrypted password by seeding crypt with original pass (ref 1)
       
     //if (hash_equals($this_user_password, crypt($password, $this_user_password))) { // Password ok so continue
-      if(crypt($password,$this_UserPassword) == $this_UserPassword) {
+      if(crypt($password,$this_user_password) == $this_user_password) {
 
       // Set session id to unique value to prevent piggy-backing
         $id = uniqid("");
