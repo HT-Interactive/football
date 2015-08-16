@@ -7,7 +7,7 @@ if(isset($_REQUEST['Show'])) {
 echo "<form action=\"index.php\" method=\"get\">
       <select name=\"year\">";
 
-$years = [2014,2015];
+$years = [2015];
 
 foreach($years as $year) {
   if($this_year == $year) {
@@ -17,8 +17,7 @@ foreach($years as $year) {
   }
 }
 
-echo "<option>2015</option>
-      </select>
+echo "</select>
       <select name=\"phase\">";
 
 $phases = ['Preseason','Regular','Postseason'];
