@@ -68,11 +68,11 @@ function checkName(str) {
                 if (xmlhttp.responseText == 0) {
                     
                     document.getElementById("registerButton").style.visibility = "visible";
-                    document.getElementById("loginButton").style.visibility = "hidden";
+                    //document.getElementById("loginButton").style.visibility = "hidden";
                 } else {
                     
                     document.getElementById("registerButton").style.visibility = "hidden";
-                    document.getElementById("loginButton").style.visibility = "visible";
+                    //document.getElementById("loginButton").style.visibility = "visible";
                 }
             }
         }
