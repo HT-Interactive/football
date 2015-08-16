@@ -4,6 +4,7 @@
 
   $sql = "INSERT INTO users (user_id, user_name, user_password, user_display_name) VALUES (NULL,'$username',NULL,NULL)";
   if(mysqli_query($db, $sql)) {
+    $userid = mysqli_insert_id();
     echo "<p>Welcome $username. This is your first login. Please enter a password and display name below.</p>";
     echo "<form action=\"enter_password.php\" method=\"post\" class=\"loginTable\">
     <label for=\"password\">Enter a Password:</label>
@@ -15,6 +16,7 @@
     <label for=\"displayname\">Enter a Display Name:</label>
     <input type=\"text\" name=\"displayname\" size=\"12\" />
     <input type=\"hidden\" name=\"username\" value=\"$username\" />
+    <input type=\"hidden\" name=\"userid\" value=\"$userid\" />
     <input type=\"submit\" name=\"continue\" value=\"Continue::\" />
     </form>";
   } else {

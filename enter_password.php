@@ -8,6 +8,7 @@
     $password=$_REQUEST['password'];
     $password2=$_REQUEST['password2'];
     $displayname=$_REQUEST['displayname'];
+    $userid = $_REQUEST['userid'];
     if($password2==$password) {
 
     } else {
@@ -52,6 +53,7 @@
         // header("Set-Cookie: username=$username; path=/;");
         setcookie("username",$username,$time);
         setcookie("displayname",$displayname,$time);
+        setcookie("userid",$userid,$time);
         // echo "$username,$password,$crypt_password";
       // Point browser to user page (ref 1)
         $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?message=".$error;
