@@ -26,7 +26,11 @@
 
     if($this_user = mysqli_fetch_array($user_result)) { // User name exists so continue
 
-      $crypt_password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+      if($_SERVER['HTTP_HOST']=="evose.com") { //on evose server
+        $crypt_password = crypt($password);
+      } else {
+        $crypt_password = password_hash($password, PASSWORD_DEFAULT); //encrypt password
+      }
       $sql = "UPDATE users SET user_password='$crypt_password', user_display_name='$displayname' WHERE user_name='$username'";
       
       if(mysqli_query($db,$sql)) {
