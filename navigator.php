@@ -1,5 +1,14 @@
-<?php
+<div id='topnavDIV' class='topnavContainer'>
+<div class='container-fluid' style='max-width:1600px;margin-left:0px;padding-left:0;'>
+<ul class='nav nav-pills topnav'>
+<li><a href='index.php?view=standings' class='topnav_html'>Standings</a></li>
+<li><a href='index.php' class='topnav_html'>My Picks</a></li>
+</ul>
+</div>
+</div>
+<?php // Navigation Header
 
+// Show Main Links
 if(isset($_REQUEST['Show'])) {
   extract($_REQUEST,EXTR_PREFIX_ALL,"this");
 }

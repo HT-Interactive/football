@@ -1,10 +1,11 @@
-<?php
+<?php // Main Pick Selection Page
 
 include("get_winner.php");
 
-if(isset($_REQUEST['Show'])) {
+if(isset($_REQUEST['Show'])) { // user wants to display specific week
   extract($_REQUEST,EXTR_PREFIX_ALL,"this");
-} else {
+  // add check for year phase and week
+} else { // try to estimate the current week
   $query = "SELECT * FROM game WHERE finished=FALSE ORDER BY start_time ASC";
   $result = pg_query($query) or die('Query failed: ' . pg_last_error());
   $next_game = pg_fetch_array($result, null, PGSQL_ASSOC);
@@ -13,30 +14,26 @@ if(isset($_REQUEST['Show'])) {
   $this_phase = $next_game['season_type'];
   $this_week = $next_game['week'];
 
-  //$goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/index.php?year=".$this_year."&phase=".$this_phase."&week=".$this_week;
-  //header("Location: http://".$goTo);
-  //exit;
 }
 
-// Performing SQL query
+// Performing SQL query for correct week
 $query = "SELECT * FROM game WHERE season_year='$this_year' AND season_type='$this_phase' AND week='$this_week' ORDER BY start_time ASC";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
+// Get all of the users picks
 $pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_userid'");
 while($user_pick = mysqli_fetch_array($pick_result)) {
   $user_picks[] = $user_pick;
 }
 
-
-//print_r($user_picks);
-
 // Printing results in HTML
-echo "<h>$this_year $this_phase Week $this_week</h>";
+echo "<div class=\"row\">\n<div class=\"col-md-12\">\n<h2>$this_year $this_phase Week $this_week</h2>";
 $my_points = getWeeklyPoints($db,$this_userid,$this_year,$this_phase,$this_week);
 echo "<p>You have <b>$my_points points</b> this week. ";
 $current_time = date("l h:iA T", time());
 echo "The current time is <b>".$current_time."</b></p>";
-echo "<table>\n";
+echo "</div>\n</div>\n";
+echo "<div class=\"row\" >\n<div class=\"col-md-12\">\n<table class=\"pickTable\">\n";
 while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     echo "\t<tr>\n";
     //$home_team = $games['home_team'];
@@ -77,8 +74,8 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
       $onclick_away_str = "alert('Game Started')";
       $onclick_home_str = "alert('Game Started')";
     }
-    echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\" onclick=\"$onclick_away_str\">$this_away_team</td><td>($this_away_score)</td><td>at</td><td id=\"$this_gsis_id"."_home\"style=\"color:$home_color;\" onclick=\"$onclick_home_str\">$this_home_team</td><td>($this_home_score)</td><td>on</td><td>$this_day_of_week</td><td>$this_start_time_EST</td>\n";
-    echo "<td>";
+    echo "\t\t<td id=\"$this_gsis_id"."_away\" class=\"teamCell\" style=\"color:$away_color;\" onclick=\"$onclick_away_str\">$this_away_team</td><td class=\"scoreCell\">($this_away_score)</td><td>at</td><td id=\"$this_gsis_id"."_home\" class=\"teamCell\" style=\"color:$home_color;\" onclick=\"$onclick_home_str\">$this_home_team</td><td class=\"scoreCell\">($this_home_score)</td><td>on</td><td class=\"dayCell\">$this_day_of_week</td><td class=\"timeCell\">$this_start_time_EST</td>\n";
+    echo "<td class=\"resultCell\">";
 
     if(isset($user_picks)) { //at least some picks in db
 
@@ -122,7 +119,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     
     echo "\t</tr>\n";
 }
-echo "</table>\n";
+echo "</table>\n</div>\n</div>\n";
 if(strtotime($this_start_time) > time()) {
   $score_visibility = "visible";
 } else {

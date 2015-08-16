@@ -1,0 +1,32 @@
+.pickContainer {
+  text-align: left;
+  /* border: 3px solid blue; */
+}
+.pickTable {
+  /* max-width: 330px; */
+  padding: 0px;
+  margin: 0 auto;
+  text-align: left;
+  font-size: x-small;
+  /* position: relative; */
+  /* left: 0px; */
+  /* border: 3px solid black; */
+}
+.pickTable td {
+  padding: 2px;
+}
+.teamCell {
+  font-size: medium;
+}
+.teamCell:hover {
+  background-color: #e7e7e7;
+}
+.scoreCell {
+  font-size: small;
+}
+.dayCell {
+  font-size: small;
+}
+.timeCell {
+  font-size: x-small;
+}

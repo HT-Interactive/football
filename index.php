@@ -1,22 +1,26 @@
-<?php
+<?php // Football Selection Site
 
-// Load DB
+// file: index.php
+// date created: 16-Aug-2015
+// date updated: 16-Aug-2015
+// by: Jeff Moreland <jeff@evose.com>
+
+// Load Databases
   require("mysql.php");
 
+// Set Standard timezone to Eastern Daylight
   date_default_timezone_set('America/New_York');
 
 // Start Session; if first visit test for cookies
   if(!isset($_COOKIE['cookies'])) {
     session_start();
-    $time = time()+3600;
-    //header("Set-Cookie: cookies=yes; path=/;");
     setcookie("cookies","yes");
   } else {
     session_start();
   }
 
-  if(isset($_COOKIE['username'])) {
-
+// Test to see if user is logged in
+  if(isset($_COOKIE['userid'])) { // A user is logged in so initialize variables
       $this_username = $_COOKIE['username']; 
       $this_userid = $_COOKIE['userid']; 
       $this_displayname = $_COOKIE['displayname'];
@@ -37,146 +41,126 @@
   }
 
 ?>
-<html>
-<head>
-<script>
-function showHint(str) {
-    if (str.length == 0) {
-        document.getElementById("txtHint").innerHTML = "";
-        return;
-    } else {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
-            }
-        }
-        xmlhttp.open("GET", "gethint.php?q=" + str, true);
-        xmlhttp.send();
-    }
-}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Jeff Moreland <jeff@evose.com>">
+    <link rel="icon" href="../../favicon.ico">
 
-function checkName(str) {
-    if (str.length == 0) {
-        document.getElementById("registerButton").style.visibility = "hidden";
-        return;
-    } else {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                
-                if (xmlhttp.responseText == 0) {
-                    
-                    document.getElementById("registerButton").style.visibility = "visible";
-                    //document.getElementById("loginButton").style.visibility = "hidden";
-                } else {
-                    
-                    document.getElementById("registerButton").style.visibility = "hidden";
-                    //document.getElementById("loginButton").style.visibility = "visible";
-                }
-            }
-        }
-        xmlhttp.open("GET", "checkname.php?n=" + str, true);
-        xmlhttp.send();
-    }
-}
+    <title>Football Selection Site</title>
 
-function pickTeam(element,u,g,y,t,wk,w) { //dom_element,user,game_id,year,type,week,winner
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
-  // alert(w);
-  //element.style.color = "green";
-  //home_color = document.getElementById(g+"_home").style.color;
-  //away_color = document.getElementById(g+"_away").style.color;
-  if(element.id == g+"_home") { // user picked home team
-    document.getElementById(g+"_home").style.color = "green";
-    document.getElementById(g+"_away").style.color = "black";
-  } else { // user picked away team
-    document.getElementById(g+"_away").style.color = "green";
-    document.getElementById(g+"_home").style.color = "black";
-  }
-  //if(document.getElementById("score_span_"+g)) {
-  //  document.getElementById("score_span_"+g).style.visibility = "visible";
-  //}
+    <!-- Custom styles for this template -->
+    <link href="css/navbar-fixed-top.css" rel="stylesheet">
+    <link href="css/signin.css" rel="stylesheet">
+    <link href="css/football.css" rel="stylesheet">
 
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-          /*
-          if (xmlhttp.responseText == 0) {
-              
-              document.getElementById("registerButton").style.visibility = "visible";
-              document.getElementById("loginButton").style.visibility = "hidden";
-          } else {
-              
-              document.getElementById("registerButton").style.visibility = "hidden";
-              document.getElementById("loginButton").style.visibility = "visible";
-          }
-          */
-      }
-  }
-  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&season_year=" + y + "&season_type=" + t + "&week=" + wk + "&winner=" + w, true);
-  xmlhttp.send();
+   <script src="js/football.js"></script>
 
-}
+  </head>
 
-function enterScore(u,g,y,t,wk,s) {
-  alert('Score of '+s+' submitted.');
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+  <body>
 
-      }
-  }
-  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&season_year=" + y + "&season_type=" + t + "&week=" + wk + "&score=" + s, true);
-  xmlhttp.send();
-
-}
-</script>
-</head>
-<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Football</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Picks <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="index.php">Current Week</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">2015 Regular Season</li>
+                <li><a href="index.php?Show=yes&year=2015&phase=Preseason&week=1">Week 1</a></li>
+                <li><a href="index.php?Show=yes&year=2015&phase=Preseason&week=2">Week 2</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Standings <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Current Standings</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">2015 Regular Season</li>
+                <li><a href="#">Week 1</a></li>
+                <li><a href="#">Week 2</a></li>
+                <li><a href="#">Final</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
 <?php
 
   if(isset($this_username)) {
 
-    echo "<div class=\"actionbar\">
-    <span class=\"sampleHeader\">Welcome $this_displayname. <a href=\"login.php?logout=yes\">[Logout]</a></span>
-    </div>";
-    include("navigator.php");
+    echo "<li class=\"active\"><a href=\"login.php?logout=yes\">Sign Out</a></li>";
+    echo "<li><a href=\"#\">$this_displayname</a></li>";
+
+  } else {
+    echo "<li class=\"active\"><a href=\"./\">Sign In</a></li>";
+
+  }
+
+?>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+
+<?php
+
+  if(isset($this_username)) {
+
     include("current_schedule.php");
 
   } elseif(isset($_REQUEST['register'])) {
 
-    $username = $_REQUEST['register'];
-    include("register.php");
+    //$username = $_REQUEST['register'];
+    include("register.inc");
 
   } else {
 
-    echo "<div class=\"actionbar\">
-    <span class=\"sampleHeader\">Welcome to the Wiater Family Football Site.</span>
-    </div>";
-
-    echo "<div class=\"displayer\">
-    <div class=\"displayerContent\">";
-    
-      echo "<form action=\"login.php\" method=\"post\" class=\"loginTable\">
-      <label for=\"username\">Email Address:</label>
-      <input type=\"text\" name=\"username\" size=\"12\" onkeyup=\"checkName(this.value)\" />
-      <input id=\"registerButton\" type=\"submit\" name=\"register\" value=\"Register\" class=\"login\" style=\"visibility: visible;\" />
-      <span id=\"loginButton\">
-      <label for=\"password\">Password:</label>
-      <input type=\"password\" name=\"password\" size=\"12\" />
-      <input type=\"submit\" name=\"login\" value=\"Login\" class=\"login\" />
-      </span>
-      </form></div>";
-    
+    include("signin.inc");
   }
-   
+
 ?>
 
-<p>Response: <span id="txtHint"></span></p>
 
-</body>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+  </body>
 </html>

@@ -8,7 +8,7 @@
   }
 
 // Connect to PostgreSQL DB
-  if($_SERVER['HTTP_HOST']=="evose.com") { //on evose server
+  if(substr_compare($_SERVER['HTTP_HOST'],"evose.com",-9, 9)==0) { //on evose server
     $db_nfl = pg_connect("host=localhost dbname=evosecom_nfldb user=evosecom_nfl password=jmev0203")
               or die('Could not connect: ' . pg_last_error()); //something is wrong
   } else { //on local development
