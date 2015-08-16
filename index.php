@@ -81,7 +81,7 @@ function checkName(str) {
     }
 }
 
-function pickTeam(element,u,g,w) {
+function pickTeam(element,u,g,y,t,wk,w) { //dom_element,user,game_id,year,type,week,winner
 
   // alert(w);
   //element.style.color = "green";
@@ -94,6 +94,9 @@ function pickTeam(element,u,g,w) {
     document.getElementById(g+"_away").style.color = "green";
     document.getElementById(g+"_home").style.color = "black";
   }
+  //if(document.getElementById("score_span_"+g)) {
+  //  document.getElementById("score_span_"+g).style.visibility = "visible";
+  //}
 
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
@@ -113,14 +116,24 @@ function pickTeam(element,u,g,w) {
           */
       }
   }
-  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&winner=" + w, true);
+  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&season_year=" + y + "&season_type=" + t + "&week=" + wk + "&winner=" + w, true);
   xmlhttp.send();
-
-
 
 }
 
+function enterScore(u,g,y,t,wk,s) {
+  alert('Score of '+s+' submitted.');
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
 
+      }
+  }
+  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&season_year=" + y + "&season_type=" + t + "&week=" + wk + "&score=" + s, true);
+  xmlhttp.send();
+
+}
 </script>
 </head>
 <body>

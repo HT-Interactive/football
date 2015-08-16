@@ -1,5 +1,6 @@
-
 <?php
+
+include("get_winner.php");
 
 if(isset($_REQUEST['Show'])) {
   extract($_REQUEST,EXTR_PREFIX_ALL,"this");
@@ -41,6 +42,11 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     foreach($user_picks as $pick) {
       if($pick['game_id'] == $this_gsis_id) { //user has already picked game so diplay winner
         $this_winner = $pick['winner'];
+        if($pick['score']) {
+          $this_score = $pick['score'];
+        } else {
+          $this_score = "";
+        }
         if($this_away_team == $this_winner) {
           $away_color = "green";
           $home_color = "black";
@@ -52,18 +58,51 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
       } else { 
         $home_color = "black";
         $away_color = "black";
+        $this_score = "";
       }
     }
     if(strtotime($this_start_time) > time()) {
-      echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\" onclick=\"pickTeam(this,'$this_userid','$this_gsis_id','$this_away_team')\">$this_away_team</td><td>at</td><td id=\"$this_gsis_id"."_home\"style=\"color:$home_color;\" onclick=\"pickTeam(this,'$this_userid','$this_gsis_id','$this_home_team')\">$this_home_team</td><td>on</td><td>$this_start_time_EST</td>\n";
+      $onclick_away_str = "pickTeam(this,'".$this_userid."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_away_team."')";
+      $onclick_home_str = "pickTeam(this,'".$this_userid."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_home_team."')";
+      //echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\" onclick=\"pickTeam(this,'$this_userid','$this_gsis_id','$this_away_team')\">$this_away_team</td><td>at</td><td id=\"$this_gsis_id"."_home\"style=\"color:$home_color;\" onclick=\"pickTeam(this,'$this_userid','$this_gsis_id','$this_home_team')\">$this_home_team</td><td>on</td><td>$this_start_time_EST</td>\n";
     } else {
-      echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\">$this_away_team</td><td>at</td><td id=\"$this_gsis_id"."_home\" style=\"color:$home_color;\">$this_home_team</td><td>on</td><td>$this_start_time_EST</td>\n";
+      $onclick_away_str = "alert('Game Started')";
+      $onclick_home_str = "alert('Game Started')";
+      //echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\">$this_away_team</td><td>at</td><td id=\"$this_gsis_id"."_home\" style=\"color:$home_color;\">$this_home_team</td><td>on</td><td>$this_start_time_EST</td>\n";
     }
+    echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\" onclick=\"$onclick_away_str\">$this_away_team ($this_away_score)</td><td>at</td><td id=\"$this_gsis_id"."_home\"style=\"color:$home_color;\" onclick=\"$onclick_home_str\">$this_home_team ($this_home_score)</td><td>on</td><td>$this_start_time_EST</td>\n";
     echo "<td>";
     foreach($user_picks as $pick) {
       if($pick['game_id'] == $this_gsis_id) { //user has already picked game so diplay winner
         $this_winner = $pick['winner'];
-        echo "$this_winner Selected as winner.";
+        
+      // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
+      // if it returns true, print correct or add to score,,,,
+      // if false, print LOSER and don't ++score
+        if(strtotime($this_start_time) < time()) {
+          if(getGameWinner($this_gsis_id) == $this_winner) {
+            if($this_finished == "t") {
+              echo "<span style=\"color:green;\">Correct</span>"; 
+              // add point to picks table for user and gsis_id
+              addPoint($db,$pick['pick_id'],1);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+            } else {
+              echo "<span style=\"color:green;\">Winning</span>";
+            }
+          } elseif(getGameWinner($this_gsis_id) == "tied") {
+              echo "<span style=\"color:blue;\">Tied</span>";
+          } else {
+            if($this_finished == "t") {
+              echo "<span style=\"color:red;\">Loser</span>";
+              addPoint($db,$pick['pick_id'],0);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+            } else {
+              echo "<span style=\"color:red;\">Losing</span>";
+            }
+          }
+        }
+       
+       
       } else { // show count down timer
         
       }
@@ -73,7 +112,12 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     echo "\t</tr>\n";
 }
 echo "</table>\n";
-
+if(strtotime($this_start_time) > time()) {
+  $score_visibility = "visible";
+} else {
+  $score_visibility = "hidden";
+}
+echo "<span id=\"score_span_$this_gsis_id\"> Tiebreaker Score of $this_away_team at $this_home_team:<input type=\"text\" id=\"score\" name=\"score\" value=\"$this_score\" /><button style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button></span>";
 // Free resultset
 pg_free_result($result);
 

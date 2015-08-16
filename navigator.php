@@ -7,7 +7,7 @@ if(isset($_REQUEST['Show'])) {
 echo "<form action=\"index.php\" method=\"get\">
       <select name=\"year\">";
 
-$years = [2015];
+$years = [2014,2015];
 
 foreach($years as $year) {
   if($this_year == $year) {
