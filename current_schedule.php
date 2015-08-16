@@ -31,14 +31,16 @@ while($user_pick = mysqli_fetch_array($pick_result)) {
 
 // Printing results in HTML
 echo "<h>$this_year $this_phase Week $this_week</h>";
-$current_time = date("Y m d h:i T", time());
-echo "<p>".$current_time."</p>";
+$my_points = getWeeklyPoints($db,$this_userid,$this_year,$this_phase,$this_week);
+echo "<p>You have <b>$my_points points</b> this week. ";
+$current_time = date("l h:iA T", time());
+echo "The current time is <b>".$current_time."</b></p>";
 echo "<table>\n";
 while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     echo "\t<tr>\n";
     //$home_team = $games['home_team'];
     extract($games,EXTR_PREFIX_ALL,"this");
-    $this_start_time_EST = date("l h:iA T", strtotime($this_start_time));
+    $this_start_time_EST = date("h:iA T", strtotime($this_start_time));
     foreach($user_picks as $pick) {
       if($pick['game_id'] == $this_gsis_id) { //user has already picked game so diplay winner
         $this_winner = $pick['winner'];
@@ -70,7 +72,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
       $onclick_home_str = "alert('Game Started')";
       //echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\">$this_away_team</td><td>at</td><td id=\"$this_gsis_id"."_home\" style=\"color:$home_color;\">$this_home_team</td><td>on</td><td>$this_start_time_EST</td>\n";
     }
-    echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\" onclick=\"$onclick_away_str\">$this_away_team ($this_away_score)</td><td>at</td><td id=\"$this_gsis_id"."_home\"style=\"color:$home_color;\" onclick=\"$onclick_home_str\">$this_home_team ($this_home_score)</td><td>on</td><td>$this_start_time_EST</td>\n";
+    echo "\t\t<td id=\"$this_gsis_id"."_away\" style=\"color:$away_color;\" onclick=\"$onclick_away_str\">$this_away_team ($this_away_score)</td><td>at</td><td id=\"$this_gsis_id"."_home\"style=\"color:$home_color;\" onclick=\"$onclick_home_str\">$this_home_team ($this_home_score)</td><td>on</td><td>$this_day_of_week</td><td>$this_start_time_EST</td>\n";
     echo "<td>";
     foreach($user_picks as $pick) {
       if($pick['game_id'] == $this_gsis_id) { //user has already picked game so diplay winner

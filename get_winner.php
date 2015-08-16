@@ -30,12 +30,13 @@ function addPoint($db,$id,$p) {
 
 
 function updatePoints($db,$userid,$season_year,$season_type,$week) {
-   // check picks table for games that match season/week and sum them
-  $sql = "SELECT SUM(points) AS points_sum FROM picks WHERE user_id='$userid' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'"; 
-  $result = mysqli_query($db,$sql);
-  $row = mysqli_fetch_assoc($result); 
-  $sum = $row['points_sum'];
+  // check picks table for games that match season/week and sum them
+  //$sql = "SELECT SUM(points) AS points_sum FROM picks WHERE user_id='$userid' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'"; 
+  //$result = mysqli_query($db,$sql);
+  //$row = mysqli_fetch_assoc($result); 
+  //$sum = $row['points_sum'];
   //echo $sum;
+  $sum = getWeeklyPoints($db,$userid,$season_year,$season_type,$week);
 
   $sql = "SELECT * FROM points WHERE user_id='$userid' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'";
   $result = mysqli_query($db,$sql);
@@ -59,7 +60,13 @@ function updatePoints($db,$userid,$season_year,$season_type,$week) {
 
   }    
 
+}
 
+function getWeeklyPoints($db,$userid,$season_year,$season_type,$week) {
+  $sql = "SELECT SUM(points) AS points_sum FROM picks WHERE user_id='$userid' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'"; 
+  $result = mysqli_query($db,$sql);
+  $row = mysqli_fetch_assoc($result); 
+  return $row['points_sum'];
 }
 
 ?>
