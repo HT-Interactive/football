@@ -1,22 +1,37 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+  padding-top: 30px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
 .pickContainer {
   text-align: left;
   /* border: 3px solid blue; */
 }
 .pickTable {
-  /* max-width: 330px; */
-  padding: 0px;
-  margin: 0 auto;
   text-align: left;
   font-size: x-small;
-  /* position: relative; */
-  /* left: 0px; */
-  /* border: 3px solid black; */
+  /* position: absolute; */
 }
 .pickTable td {
   padding: 2px;
 }
 .teamCell {
   font-size: medium;
+  text-align: center;
+  border: 1px solid DarkGray;;
+  border-radius: 4px;
 }
 .teamCell:hover {
   background-color: #e7e7e7;
@@ -29,4 +44,29 @@
 }
 .timeCell {
   font-size: x-small;
+}
+.weekSelector > li > a {
+  padding-top: 4px;
+  padding-bottom: 0;
+  height: 28px;
+}
+.weekSelector {
+  min-height: 28px;
+  top: 50px;
+  /* z-index: -1; */
+}
+.weekSelector-text {
+  margin-top: 3px;
+  margin-bottom: 0px;
+  position: absolute;
+  top: 6px;
+  left: 10px;
+}
+@media (min-width: 768px) {
+  .weekSelector-text {
+    display: none;
+  }
+}
+.navbar-inverse .weekSelector-text {
+  color: #9d9d9d;
 }

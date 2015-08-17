@@ -65,8 +65,12 @@ function updatePoints($db,$userid,$season_year,$season_type,$week) {
 function getWeeklyPoints($db,$userid,$season_year,$season_type,$week) {
   $sql = "SELECT SUM(points) AS points_sum FROM picks WHERE user_id='$userid' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'"; 
   $result = mysqli_query($db,$sql);
-  $row = mysqli_fetch_assoc($result); 
-  return $row['points_sum'];
+  $row = mysqli_fetch_assoc($result);
+  if($row['points_sum'] > 0) {
+    return $row['points_sum'];
+  } else {
+    return 0;
+  }
 }
 
 ?>

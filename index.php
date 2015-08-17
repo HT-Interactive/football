@@ -40,6 +40,31 @@
 
   }
 
+// Load Winner Script
+  include("get_winner.php");
+
+// Guess Current Week
+  $query = "SELECT * FROM game WHERE finished=FALSE ORDER BY start_time ASC";
+  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+  $next_game = pg_fetch_array($result, null, PGSQL_ASSOC);
+
+  $current_season_year = $next_game['season_year'];
+  $current_season_type = $next_game['season_type'];
+  $current_week = $next_game['week'];
+
+// Get any passed variables and extract them
+  extract($_REQUEST,EXTR_PREFIX_ALL,"this");
+  
+  if(!isset($this_season_year)) { // user did not pass year so assume current
+    $this_season_year = $current_season_year;
+  }  
+  if(!isset($this_season_type)) { // user did specify so assume current
+    $this_season_type = $current_season_type;
+  }
+  if(!isset($this_week)) { // user did specify so assume current
+    $this_week = $current_week;
+  }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,10 +83,12 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="css/navbar-fixed-top.css" rel="stylesheet">
+    <!-- <link href="css/navbar-fixed-top.css" rel="stylesheet"> -->
     <link href="css/signin.css" rel="stylesheet">
+    <link href="css/sticky-footer-navbar.css" rel="stylesheet">
     <link href="css/football.css" rel="stylesheet">
 
+    
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -74,86 +101,40 @@
 
   <body>
 
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Football</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Picks <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="index.php">Current Week</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">2015 Regular Season</li>
-                <li><a href="index.php?Show=yes&year=2015&phase=Preseason&week=1">Week 1</a></li>
-                <li><a href="index.php?Show=yes&year=2015&phase=Preseason&week=2">Week 2</a></li>
-              </ul>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Standings <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Current Standings</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">2015 Regular Season</li>
-                <li><a href="#">Week 1</a></li>
-                <li><a href="#">Week 2</a></li>
-                <li><a href="#">Final</a></li>
-              </ul>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-<?php
-
-  if(isset($this_username)) {
-
-    echo "<li class=\"active\"><a href=\"login.php?logout=yes\">Sign Out</a></li>";
-    echo "<li><a href=\"#\">$this_displayname</a></li>";
-
-  } else {
-    echo "<li class=\"active\"><a href=\"./\">Sign In</a></li>";
-
-  }
-
-?>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+    <?php include("navigator.php"); ?>
+    <?php include("selector.php"); ?>
 
     <div class="container">
 
       <!-- Main component for a primary marketing message or call to action -->
 
-<?php
 
-  if(isset($this_username)) {
+      <?php
 
-    include("current_schedule.php");
+        if(isset($this_username)) {
 
-  } elseif(isset($_REQUEST['register'])) {
+          include("current_schedule.php");
 
-    //$username = $_REQUEST['register'];
-    include("register.inc");
+        } elseif(isset($_REQUEST['register'])) {
 
-  } else {
+          //$username = $_REQUEST['register'];
+          include("register.inc");
 
-    include("signin.inc");
-  }
+        } else {
 
-?>
+          include("signin.inc");
+        }
+
+      ?>
 
 
     </div> <!-- /container -->
 
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted"><?php echo "You have <b>$my_points points</b> this week. <a href=\"index.php?season_year=$current_season_year&season_type=$current_season_type&week=$current_week\" class=\"navbar-link\">Show picks for the Current Week</a>."; ?></p>
+      </div>
+    </footer>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
