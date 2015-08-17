@@ -15,8 +15,7 @@ while($user_pick = mysqli_fetch_array($pick_result)) {
 echo "<table class=\"pickTable\">\n";
 
 while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
-
-  echo "\t<tr>\n"; //start new row in table
+  //print_r($games);
 
   extract($games,EXTR_PREFIX_ALL,"this"); //load all game variables from db_array
 
@@ -31,6 +30,13 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     $has_finished = false;
   }
 
+  if(!isset($last_day_of_week) || $this_day_of_week != $last_day_of_week) { //print date row
+    echo "<tr><td colspan=\"6\">";
+    echo date('l, F j Y',strtotime($this_start_time));
+    echo "</td></tr>";
+  }
+
+  $last_day_of_week = $this_day_of_week; //set last day to this day for next iteration
 
   $this_start_time_EST = date("g:iA T", strtotime($this_start_time));
 
@@ -49,8 +55,61 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
           $home_style = "color:black;background-color:#eee";
         } elseif($this_home_team == $this_winner) {
           $home_style = "color:green;background-color:LightGray;";
-          $away_style = "color:black;background-color:#eee";        }
+          $away_style = "color:black;background-color:#eee";        
+        }
+
+      // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
+      // if it returns true, print correct or add to score,,,,
+      // if false, print LOSER and don't ++score
+        if(strtotime($this_start_time) < time()) {
+          if(getGameWinner($this_gsis_id) == $this_winner) {
+            if($this_finished == "t") {
+              $result_span = "correct";
+              //echo "<span style=\"color:green;\">Correct</span>"; 
+              // add point to picks table for user and gsis_id
+              addPoint($db,$pick['pick_id'],1);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+            } else {
+              $result_span = "winning";
+              //echo "<span style=\"color:green;\">Winning</span>";
+            }
+          } elseif(getGameWinner($this_gsis_id) == "tied") {
+              $result_span = "tied";
+              //echo "<span style=\"color:blue;\">Tied</span>";
+          } else {
+            if($this_finished == "t") {
+              $result_span = "incorrect";
+              //echo "<span style=\"color:red;\">Loser</span>";
+              addPoint($db,$pick['pick_id'],0);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+            } else {
+              $result_span = "losing";
+              //echo "<span style=\"color:red;\">Losing</span>";
+            }
+          }
+        } else {
+          $result_span = "";
+        }
+
+        switch($result_span) {
+          case "correct":
+            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","ok","green");
+            break;
+          case "incorrect":
+            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","remove", "red");
+            break;
+          case "winning":
+            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","arrow-up", "green");
+            break;
+          case "losing":
+            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","arrow-down", "red");
+            break;
+          case "tied":
+            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","sort", "blue");
+            break;
+        }
         break;
+
       } else { 
         $home_style = "color:black;background-color:#eee";
         $away_style = "color:black;background-color:#eee";
@@ -69,6 +128,10 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     $onclick_away_str = "alert('Game Started')";
     $onclick_home_str = "alert('Game Started')";
   }
+
+//Game Row start
+  echo "\t<tr>\n"; //start new row in table
+
 //Away Team Cell
   echo "<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell\" style=\"text-align:right;$away_style;\">$this_away_team</div></td>";
 //Away Team Score
@@ -86,13 +149,19 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   echo "</td>";
 //Home Team Cell
   echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell\" style=\"text-align:left;$home_style;\">$this_home_team</div></td>";
+//Result Cell
+  echo "<td class=\"dayCell\">";
+  if(isset($result_span)) {
+    echo $result_span;
+   }
+   echo "</td>";
 //Game Date
-  echo "<td>on</td>";
-  echo "<td class=\"dayCell\">$this_day_of_week</td>";
-  echo "<td class=\"timeCell\">";
-  echo date('F j Y',strtotime($this_start_time));
-  echo "</td>";
-  echo "<td class=\"timeCell\">$this_start_time_EST</td>";
+  //echo "<td>at</td>";
+  //echo "<td class=\"dayCell\">$this_day_of_week</td>";
+  //echo "<td class=\"timeCell\">";
+  //echo date('F j Y',strtotime($this_start_time));
+ // echo "</td>";
+  echo "<td class=\"dayCell\">at $this_start_time_EST</td>";
 //Pick Result
   echo "<td class=\"resultCell\">";
   //echo "<button onclick=\"alert('Test')\">Test Me</button>";
@@ -141,16 +210,35 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
 
 } //End While
 
-if(strtotime($this_start_time) > time()) {
-  $score_visibility = "visible";
-} else {
-  $score_visibility = "hidden";
-}
-echo "<tr><td colspan=\"9\"><p id=\"score_span_$this_gsis_id\" class=\"form-inline\"><label for=\"score\">Tiebreaker Score of $this_away_team at $this_home_team</label><input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" class=\"form-control\" size=\"3\" /><button class=\"btn btn-primary btn-sm\" style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button></p></td></tr>";
-echo "</table>";
-//echo "</div>\n</div>";
 
-//echo "<div class=\"row\">\n<div class=\"col-md-12\">\n<p id=\"score_span_$this_gsis_id\" class=\"form-inline\"><label for=\"score\">Tiebreaker Score of $this_away_team at $this_home_team</label><input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" class=\"form-control\" size=\"3\" /><button class=\"btn btn-primary btn-sm\" style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button></p>";
+if(isset($this_gsis_id)) {
+  if(strtotime($this_start_time) > time()) {
+    $score_visibility = "visible";
+    $diff_visibility = "hidden";
+  } else {
+    $score_visibility = "hidden";
+    $diff_visibility = "visible";
+    $current_score = $this_home_score + $this_away_score;
+    $score_diff = $this_score - $current_score;
+  }
+  //echo "<tr><td colspan=\"6\"><p id=\"score_span_$this_gsis_id\" class=\"form-inline\"><label for=\"score\">Tiebreaker Score of $this_away_team at $this_home_team</label><input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" class=\"form-control\" size=\"3\" /><button class=\"btn btn-primary btn-sm\" style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button></p></td></tr>";
+  echo "</table>";
+  //echo "</div>\n</div>";
+
+  echo "<form class=\"form-inline\">";
+  echo "<div class=\"input-group input-group-sm\">
+    <span class=\"input-group-addon\" id=\"basic-addon1\">Score of $this_away_team at $this_home_team</span>
+    <input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" size=\"1\" />
+    <span class=\"input-group-addon\" style=\"visibility:$diff_visibility;\" id=\"basic-addon2\">$score_diff</span>
+    <span class=\"input-group-btn\">
+      <button class=\"btn btn-primary\" style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button>
+    </span>
+  </form>
+  </div>";
+} else {
+  echo "<p>No games this week.</p>";
+}
+
 //echo "</div>\n</div>";
 
 // Free resultset

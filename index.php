@@ -102,7 +102,7 @@
   <body>
 
     <?php include("navigator.php"); ?>
-    <?php include("selector.php"); ?>
+    <?php if(isset($this_username)) { include("selector.php"); } ?>
 
     <div class="container">
 
@@ -113,7 +113,8 @@
 
         if(isset($this_username)) {
 
-          include("current_schedule.php");
+          //include("current_schedule.php");
+          include("current_schedule_grouped.php");
 
         } elseif(isset($_REQUEST['register'])) {
 
@@ -130,11 +131,7 @@
 
     </div> <!-- /container -->
 
-    <footer class="footer">
-      <div class="container">
-        <p class="text-muted"><?php echo "You have <b>$my_points points</b> this week. <a href=\"index.php?season_year=$current_season_year&season_type=$current_season_type&week=$current_week\" class=\"navbar-link\">Show picks for the Current Week</a>."; ?></p>
-      </div>
-    </footer>
+    <?php if(isset($this_username)) { include("footer.php"); } ?>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

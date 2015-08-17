@@ -14,43 +14,29 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Picks <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="index.php">Current Week</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">2015 Regular Season</li>
-                <li><a href="index.php?Show=yes&year=2015&phase=Preseason&week=1">Week 1</a></li>
-                <li><a href="index.php?Show=yes&year=2015&phase=Preseason&week=2">Week 2</a></li>
-              </ul>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Standings <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Current Standings</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">2015 Regular Season</li>
-                <li><a href="#">Week 1</a></li>
-                <li><a href="#">Week 2</a></li>
-                <li><a href="#">Final</a></li>
-              </ul>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="#">My Picks</a></li>
+            <li><a href="#about">Standings</a></li>
+          </ul>                
+
 <?php
 
   if(isset($this_username)) {
 
-    echo "<li class=\"active\"><a href=\"login.php?logout=yes\">Sign Out</a></li>";
-    echo "<li><a href=\"#\">$this_displayname</a></li>";
+    echo "<form class=\"navbar-form navbar-right\" action=\"login.php\">";
+    echo "<button type=\"submit\" name=\"logout\" value=\"yes\" class=\"btn btn-default\">Sign out</button>";
+    echo "</form>";
+    echo "<p class=\"navbar-text navbar-right\">Signed in as <a href=\"#\" class=\"navbar-link\">$this_displayname</a></p>";
+
 
   } else {
-    echo "<li class=\"active\"><a href=\"./\">Sign In</a></li>";
+
+    echo "<form class=\"navbar-form navbar-right\" role=\"signin\" action=\"index.php\">";
+    echo "<button type=\"submit\" name=\"login\" value=\"yes\" class=\"btn btn-default\">Sign in</button>";
+    echo "</form>";
 
   }
 
 ?>
-          </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
