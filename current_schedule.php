@@ -44,16 +44,15 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
           $this_score = "";
         }
         if($this_away_team == $this_winner) {
-          $away_color = "green";
-          $home_color = "black";
+          $away_style = "color:green;background-color:LightGray;";
+          $home_style = "color:black;background-color:#eee";
         } elseif($this_home_team == $this_winner) {
-          $home_color = "green";
-          $away_color = "black";
-        }
+          $home_style = "color:green;background-color:LightGray;";
+          $away_style = "color:black;background-color:#eee";        }
         break;
       } else { 
-        $home_color = "black";
-        $away_color = "black";
+        $home_style = "color:black;background-color:#eee";
+        $away_style = "color:black;background-color:#eee";
         $this_score = "";
       }
     }
@@ -69,7 +68,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     $onclick_away_str = "alert('Game Started')";
     $onclick_home_str = "alert('Game Started')";
   }
-  echo "\t\t<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell\" style=\"text-align:right;color:$away_color;\">$this_away_team</div></td><td>";
+  echo "\t\t<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell\" style=\"text-align:right;$away_style;\">$this_away_team</div></td><td>";
   if($has_started) {
     echo "<span class=\"badge\">$this_away_score</span>";
   }
@@ -77,7 +76,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   if($has_started) {
     echo "<span class=\"badge\">$this_home_score</span>";
   }
-  echo "</td><td id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\"><div class=\"teamCell\" style=\"text-align:left;color:$home_color;\">$this_home_team</div></td><td>on</td><td class=\"dayCell\">$this_day_of_week</td><td class=\"timeCell\">$this_start_time_EST</td>\n";
+  echo "</td><td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell\" style=\"text-align:left;$home_style;\">$this_home_team</div></td><td>on</td><td class=\"dayCell\">$this_day_of_week</td><td class=\"timeCell\">$this_start_time_EST</td>\n";
   echo "<td class=\"resultCell\">";
   //echo "<button onclick=\"alert('Test')\">Test Me</button>";
 

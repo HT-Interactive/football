@@ -49,10 +49,14 @@ function pickTeam(element,u,g,y,t,wk,w) { //dom_element,user,game_id,year,type,w
   //away_color = document.getElementById(g+"_away").style.color;
   if(element.id == g+"_home") { // user picked home team
     document.getElementById(g+"_home").style.color = "green";
+    document.getElementById(g+"_home").style.background = "LightGray";
     document.getElementById(g+"_away").style.color = "black";
+    document.getElementById(g+"_away").style.background = "#eee";
   } else { // user picked away team
     document.getElementById(g+"_away").style.color = "green";
+    document.getElementById(g+"_away").style.background = "LightGray";
     document.getElementById(g+"_home").style.color = "black";
+    document.getElementById(g+"_home").style.background = "#eee";
   }
   //if(document.getElementById("score_span_"+g)) {
   //  document.getElementById("score_span_"+g).style.visibility = "visible";
