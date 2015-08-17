@@ -210,31 +210,25 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
 
 } //End While
 
+echo "</table>";
+echo "<form class=\"form-inline\">";
+echo "<div class=\"input-group input-group-sm\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Score of $this_away_team at $this_home_team</span>
+  <input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" size=\"1\" />";
 
 if(isset($this_gsis_id)) {
   if(strtotime($this_start_time) > time()) {
-    $score_visibility = "visible";
-    $diff_visibility = "hidden";
+    echo "<span class=\"input-group-btn\">
+    <button class=\"btn btn-primary\" type=\"button\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button>
+    </span>";
   } else {
-    $score_visibility = "hidden";
-    $diff_visibility = "visible";
     $current_score = $this_home_score + $this_away_score;
     $score_diff = $this_score - $current_score;
+    echo "<span class=\"input-group-addon\" id=\"basic-addon2\">You are off by $score_diff points.</span>";
   }
-  //echo "<tr><td colspan=\"6\"><p id=\"score_span_$this_gsis_id\" class=\"form-inline\"><label for=\"score\">Tiebreaker Score of $this_away_team at $this_home_team</label><input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" class=\"form-control\" size=\"3\" /><button class=\"btn btn-primary btn-sm\" style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button></p></td></tr>";
-  echo "</table>";
-  //echo "</div>\n</div>";
 
-  echo "<form class=\"form-inline\">";
-  echo "<div class=\"input-group input-group-sm\">
-    <span class=\"input-group-addon\" id=\"basic-addon1\">Score of $this_away_team at $this_home_team</span>
-    <input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" size=\"1\" />
-    <span class=\"input-group-addon\" style=\"visibility:$diff_visibility;\" id=\"basic-addon2\">$score_diff</span>
-    <span class=\"input-group-btn\">
-      <button class=\"btn btn-primary\" style=\"visibility:$score_visibility;\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button>
-    </span>
-  </form>
-  </div>";
+  echo "</div></form>";
+
 } else {
   echo "<p>No games this week.</p>";
 }
