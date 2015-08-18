@@ -58,7 +58,10 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
           $scores[$this_key] = $score;
 
         }//--User
-        //print_r($scores);
+        echo "<br>Scores array<br>";
+        print_r($scores);
+        echo "<br>Percents array:<br>";
+        print_r($percentages);
         asort($percentages);
         $max_p = max($percentages);
         do {
@@ -68,7 +71,7 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
         } while(next($percentages));
         reset($percentages);
         echo "Winner(s) of Week $week should be:<br>";
-        //print_r($percentages);
+        print_r($percentages);
         echo "<br>count=".count($percentages)."key=".key($percentages);
 
         if(count($percentages) > 1) { //must be a tie 
