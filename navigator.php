@@ -14,7 +14,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li <?php if(isset($this_show) && $this_show != 'standings') { echo "class=\"active\""; } ?>><a href="index.php">My Picks</a></li>
+            <li <?php if(!isset($this_show)) { echo "class=\"active\""; } ?>><a href="index.php">My Picks</a></li>
             <li <?php if(isset($this_show) && $this_show == 'standings') { echo "class=\"active\""; } ?>><a href="index.php?show=standings">Standings</a></li>
           </ul>                
 

@@ -60,26 +60,38 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
         }//--User
         echo "<br>Scores array<br>";
         print_r($scores);
-        echo "<br>Percents array:<br>";
+        echo "<br>Unsorted Percents array:<br>";
         print_r($percentages);
-        asort($percentages);
-        $max_p = max($percentages);
-        do {
-          if(current($percentages) != $max_p) {
-          array_pop($percentages);
-          }
-        } while(next($percentages));
-        reset($percentages);
-        echo "Winner(s) of Week $week should be:<br>";
-        print_r($percentages);
-        echo "<br>count=".count($percentages)."key=".key($percentages);
+        arsort($percentages);
 
-        if(count($percentages) > 1) { //must be a tie 
+        $max_p = max($percentages);
+        echo "<br>Sorted Percents array:<br>";
+        print_r($percentages);
+        echo "<br>with a max P of $max_p<br>";
+
+        if(current($percentages) == next($percentages)) { //there is a tie
+          reset($percentages);
+          do { //remove the low scores
+            if(current($percentages) != $max_p) {
+              array_shift($percentages);
+            }
+          } while(next($percentages));
+          echo "<br>Possible winners after culling:<br>";
+          print_r($percentages);
           //pull game id out of score array      
           foreach($scores as $u => $s) {
-            if($s[0] > 0) { $g_id = $s[0]; } // find game_id
+            if($s[0] > 0) { 
+              $g_id = $s[0]; 
+            } else {
+              //need some other tie breaker
+
+            }
           }
-          $game_score = getGameScore($g_id);
+          if(isset($g_id)) {
+            $game_score = getGameScore($g_id);
+          } else {
+            $game_score = 0;
+          }
           foreach($scores as $u => $s) {
             $s[1] -= $game_score;
           }
@@ -90,6 +102,25 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
 
           $season_wins[key($scores)] +=1;
 
+
+        } else {
+          reset($percentages);
+          echo key($percentages)." has won on picks.<br>";
+          $season_wins[key($percentages)] += 1;
+        }
+        do {
+          if(current($percentages) != $max_p) {
+          echo "<br>percent".current($percentages)." popped.";
+          array_pop($percentages);
+          }
+        } while(next($percentages));
+        reset($percentages);
+        echo "Winner(s) of Week $week should be:<br>";
+        print_r($percentages);
+        echo "<br>count=".count($percentages)."key=".key($percentages);
+
+        if(count($percentages) > 1) { //must be a tie 
+          
         } elseif(count($percentages) == 1) { //add a win for the user
           echo key($percentages)." has won on picks.<br>";
           $season_wins[key($percentages)] += 1;
