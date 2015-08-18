@@ -1,7 +1,7 @@
 <?php
 
 // Connect to MySQL DB
-  $db=mysqli_connect("localhost", "evosecom_fb", "jmev0203","evosecom_fb");
+  $db=mysqli_connect("localhost", "evosecom_nfl", "jmev0203","evosecom_wff");
   // Check connection
   if (mysqli_connect_errno()) {
     echo "Failed to connect to MySQL: " . mysqli_connect_error();
