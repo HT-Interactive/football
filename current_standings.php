@@ -28,6 +28,9 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
 } //--End Function
 
 function displaySeasonStandings($db,$users,$season_year,$current_week) {
+  
+  // create an invisible DIV to hold debugging info
+  echo "<div id=\"DivSeasonDebugging\" style=\"display: none;\">";
   $season_types = getSeasonTypes(); //get all types
   $season_wins = array(); //initialize win placeholder
   $total_weeks = 0;
@@ -128,6 +131,7 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
       }//--End IF
     }//--Week
   }//--Season
+  echo "</div>"; //end debug
   //print_r($season_wins);
   //echo "<div style=\"border: 1px solid green;\">";
   echo "<div id=\"DivSeasonWins\">";
@@ -188,6 +192,7 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
   echo "<div class=\"btn-group\" role=\"group\" aria-label=\"...\">
   <button type=\"button\" id=\"ButtonSeasonWins\" class=\"btn btn-default\" onclick=\"showStandings(this,'wins')\"><span class=\"glyphicon glyphicon-star\" aria-hidden=\"true\"></span> Wins</button>
   <button type=\"button\" id=\"ButtonSeasonDollars\" class=\"btn btn-default\" style=\"background-color: #eee;\" onclick=\"showStandings(this,'dollars')\"><span class=\"glyphicon glyphicon-usd\" aria-hidden=\"true\"></span> </button>
+  <button type=\"button\" id=\"ButtonSeasonWins\" class=\"btn btn-default btn-xs\" onclick=\"showDebugging(this)\"><span class=\"glyphicon glyphicon-warning-sign\" aria-hidden=\"true\"></span> Debug</button>
   </div></h2>";
   displaySeasonStandings($db,$users,$this_season_year,$current_week);
   

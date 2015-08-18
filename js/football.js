@@ -118,3 +118,14 @@ function showStandings(element,id) {
   }
   
 }
+
+function showDebugging(element) {
+  
+  if(document.getElementById("DivSeasonDebugging").style.display == "") {
+    document.getElementById("DivSeasonDebugging").style.display = "none";
+    /* document.getElementById("DivSeasonDebugging").style.position = "absolute"; */
+  } else {
+    document.getElementById("DivSeasonDebugging").style.display = "";
+    /* document.getElementById("DivSeasonDebugging").style.position = "static"; */
+  }
+}
