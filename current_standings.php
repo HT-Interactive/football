@@ -67,9 +67,9 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
           }
         } while(next($percentages));
         reset($percentages);
-        //echo "Winner(s) of Week $week should be:<br>";
+        echo "Winner(s) of Week $week should be:<br>";
         //print_r($percentages);
-        //echo "<br>count=".count($percentages)."key=".key($percentages);
+        echo "<br>count=".count($percentages)."key=".key($percentages);
 
         if(count($percentages) > 1) { //must be a tie 
           //pull game id out of score array      
@@ -83,12 +83,12 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
           $scores = array_intersect_key($scores,$percentages); //remove all but possible winners
           array_multisort($scores, SORT_ASC, SORT_NUMERIC);
 
-          //echo key($scores)." has won tie breaker.<br>";
+          echo key($scores)." has won tie breaker.<br>";
 
           $season_wins[key($scores)] +=1;
 
         } elseif(count($percentages) == 1) { //add a win for the user
-          //echo key($percentages)." has won on picks.<br>";
+          echo key($percentages)." has won on picks.<br>";
           $season_wins[key($percentages)] += 1;
         }
       }//--End IF
