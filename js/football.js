@@ -98,3 +98,23 @@ function enterScore(u,g,y,t,wk,s) {
   xmlhttp.send();
 
 }
+
+function showStandings(element,id) {
+  
+  if(id=='wins') {
+    document.getElementById("ButtonSeasonWins").style.background = "white";
+    document.getElementById("ButtonSeasonDollars").style.background = "#eee";
+    document.getElementById("DivSeasonWins").style.visibility = "visible";
+    document.getElementById("DivSeasonDollars").style.visibility = "hidden";
+    document.getElementById("DivSeasonWins").style.position = "static";
+    document.getElementById("DivSeasonDollars").style.position = "absolute";
+  } else {
+    document.getElementById("ButtonSeasonWins").style.background = "#eee";
+    document.getElementById("ButtonSeasonDollars").style.background = "white";
+    document.getElementById("DivSeasonWins").style.visibility = "hidden";
+    document.getElementById("DivSeasonDollars").style.visibility = "visible";
+    document.getElementById("DivSeasonWins").style.position = "absolute";
+    document.getElementById("DivSeasonDollars").style.position = "static";
+  }
+  
+}

@@ -8,12 +8,15 @@ body {
   padding-top: 30px;
 }
 .footer {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
   background-color: #f5f5f5;
+}
+.container .text-muted {
+  margin: 10px 0;
 }
 .pickContainer {
   text-align: left;
@@ -69,4 +72,9 @@ body {
 }
 .navbar-inverse .weekSelector-text {
   color: #9d9d9d;
+}
+.progress-label {
+  min-width: 80px;
+  float: left;
+  text-align: right;
 }

@@ -1,41 +1,5 @@
 <?php // Season Selector
 
-function getSeasonYears() {
-
-  $query = "SELECT DISTINCT season_year FROM game ORDER BY season_year ASC";
-  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-  $all_results = pg_fetch_all($result);
-  foreach($all_results as $year) {
-    $display_years[] = $year['season_year'];
-  }
-  return $display_years;
-
-}
-
-function getSeasonTypes() {
-
-  $query = "SELECT DISTINCT season_type FROM game";
-  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-  $all_results = pg_fetch_all($result);
-  foreach($all_results as $type) {
-    $display_types[] = $type['season_type'];
-  }
-  return $display_types;
-
-}
-
-function getWeeks($season_year,$season_type) {
-
-  $query = "SELECT DISTINCT week FROM game WHERE season_type='$season_type' AND season_year='$season_year' ORDER BY week ASC";
-  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-  $all_results = pg_fetch_all($result);
-  foreach($all_results as $week) {
-    $display_weeks[] = $week['week'];
-  }
-  return $display_weeks;
-
-}
-
 $my_points = getWeeklyPoints($db,$this_userid,$this_season_year,$this_season_type,$this_week); // get_winner.php
 $current_time = date("l h:iA T", time());
 

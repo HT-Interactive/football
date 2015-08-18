@@ -1,5 +1,8 @@
 <?php // Main Pick Selection Page
 
+//Turn off timer for testing
+$timer_on = false;
+
 // Performing SQL query for correct week
 $query = "SELECT * FROM game WHERE season_year='$this_season_year' AND season_type='$this_season_type' AND week='$this_week' ORDER BY start_time ASC";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -12,6 +15,9 @@ while($user_pick = mysqli_fetch_array($pick_result)) {
 
 //echo "<div class=\"row\">\n<div class=\"col-md-12\">\n<table class=\"pickTable\">\n";
 //echo "<div>\n<div>\n<table class=\"pickTable\">\n";
+if(!$timer_on) {
+  echo "<div class=\"alert alert-warning\" role=\"alert\">Game Start Timer Inactive</div>";
+}
 echo "<table class=\"pickTable\">\n";
 
 while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
@@ -67,8 +73,8 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
               $result_span = "correct";
               //echo "<span style=\"color:green;\">Correct</span>"; 
               // add point to picks table for user and gsis_id
-              addPoint($db,$pick['pick_id'],1);
-              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+              addPoint($db,$pick['pick_id'],1,false);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week,false);
             } else {
               $result_span = "winning";
               //echo "<span style=\"color:green;\">Winning</span>";
@@ -80,8 +86,8 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
             if($this_finished == "t") {
               $result_span = "incorrect";
               //echo "<span style=\"color:red;\">Loser</span>";
-              addPoint($db,$pick['pick_id'],0);
-              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+              addPoint($db,$pick['pick_id'],0,false);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week,false);
             } else {
               $result_span = "losing";
               //echo "<span style=\"color:red;\">Losing</span>";
@@ -117,16 +123,16 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
       }
     }
   } else { //user has made no picks so default to black
-    $home_color = "black";
-    $away_color = "black";
+    $home_style = "color:black;background-color:#eee";
+    $away_style = "color:black;background-color:#eee";
     $this_score = "";
   }
-  if(!$has_started) { // add pickTeam script to element
+  if($has_started && $timer_on) { // alert the user that it is too late
+    $onclick_away_str = "alert('It's too late to turn back now.')";
+    $onclick_home_str = "alert('It's too late to turn back now.')";
+  } else { // add pickTeam script to element    
     $onclick_away_str = "pickTeam(this,'".$this_userid."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_away_team."')";
     $onclick_home_str = "pickTeam(this,'".$this_userid."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_home_team."')";
-  } else { // alert the user that it is too late
-    $onclick_away_str = "alert('Game Started')";
-    $onclick_home_str = "alert('Game Started')";
   }
 
 //Game Row start
@@ -180,8 +186,8 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
             if($this_finished == "t") {
               echo "<span style=\"color:green;\">Correct</span>"; 
               // add point to picks table for user and gsis_id
-              addPoint($db,$pick['pick_id'],1);
-              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+              addPoint($db,$pick['pick_id'],1,false);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week,false);
             } else {
               echo "<span style=\"color:green;\">Winning</span>";
             }
@@ -190,8 +196,8 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
           } else {
             if($this_finished == "t") {
               echo "<span style=\"color:red;\">Loser</span>";
-              addPoint($db,$pick['pick_id'],0);
-              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week);
+              addPoint($db,$pick['pick_id'],0,false);
+              updatePoints($db,$this_userid,$this_season_year,$this_season_type,$this_week,false);
             } else {
               echo "<span style=\"color:red;\">Losing</span>";
             }
@@ -217,14 +223,14 @@ echo "<div class=\"input-group input-group-sm\">
   <input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" size=\"1\" />";
 
 if(isset($this_gsis_id)) {
-  if(strtotime($this_start_time) > time()) {
-    echo "<span class=\"input-group-btn\">
-    <button class=\"btn btn-primary\" type=\"button\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button>
-    </span>";
-  } else {
+  if($has_started && $timer_on) {
     $current_score = $this_home_score + $this_away_score;
     $score_diff = $this_score - $current_score;
     echo "<span class=\"input-group-addon\" id=\"basic-addon2\">You are off by $score_diff points.</span>";
+  } else {
+    echo "<span class=\"input-group-btn\">
+    <button class=\"btn btn-primary\" type=\"button\" onclick=\"enterScore('$this_userid','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button>
+    </span>";
   }
 
   echo "</div></form>";

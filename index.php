@@ -113,8 +113,15 @@
 
         if(isset($this_username)) {
 
-          //include("current_schedule.php");
-          include("current_schedule_grouped.php");
+          if(isset($this_show) && $this_show == "standings") {
+
+            include("current_standings.php");
+
+          } else {
+
+            //include("current_schedule.php");
+            include("current_schedule_grouped.php");
+          }
 
         } elseif(isset($_REQUEST['register'])) {
 
@@ -127,7 +134,6 @@
         }
 
       ?>
-
 
     </div> <!-- /container -->
 

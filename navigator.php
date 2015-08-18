@@ -10,12 +10,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Football</a>
+          <a class="navbar-brand" href="index.php">Football</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">My Picks</a></li>
-            <li><a href="#about">Standings</a></li>
+            <li <?php if(isset($this_show) && $this_show != 'standings') { echo "class=\"active\""; } ?>><a href="index.php">My Picks</a></li>
+            <li <?php if(isset($this_show) && $this_show == 'standings') { echo "class=\"active\""; } ?>><a href="index.php?show=standings">Standings</a></li>
           </ul>                
 
 <?php
