@@ -187,7 +187,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
               echo "<span style=\"color:green;\">Correct</span>"; 
               // add point to picks table for user and gsis_id
               addPoint($db,$pick['pick_id'],1,false);
-              updatePoints($db,$this_user_id,$this_season_year,$this_season_type,$this_week,false);
+              updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
             } else {
               echo "<span style=\"color:green;\">Winning</span>";
             }
@@ -197,7 +197,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
             if($this_finished == "t") {
               echo "<span style=\"color:red;\">Loser</span>";
               addPoint($db,$pick['pick_id'],0,false);
-              updatePoints($db,$this_user_id,$this_season_year,$this_season_type,$this_week,false);
+              updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
             } else {
               echo "<span style=\"color:red;\">Losing</span>";
             }
