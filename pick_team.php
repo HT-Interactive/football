@@ -49,7 +49,7 @@ if($this_pick = mysqli_fetch_array($pick_result)) { // User has already picked s
   
 
 } else {
-  $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points) VALUES (NULL,'$this_game_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner','$this_score',NULL)";
+  $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points) VALUES (NULL,'$this_group_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner','$this_score',NULL)";
   if(mysqli_query($db, $sql)) {
     echo "Picke entered";
   } else {

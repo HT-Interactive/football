@@ -8,7 +8,7 @@ $query = "SELECT * FROM game WHERE season_year='$this_season_year' AND season_ty
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
 // Get all of the users picks
-$pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id'");
+$pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$this_group_id'");
 while($user_pick = mysqli_fetch_array($pick_result)) {
   $user_picks[] = $user_pick;
 }
@@ -74,7 +74,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
               //echo "<span style=\"color:green;\">Correct</span>"; 
               // add point to picks table for user and gsis_id
               addPoint($db,$pick['pick_id'],1,false);
-              updatePoints($db,$this_user_id,$this_season_year,$this_season_type,$this_week,false);
+              updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
             } else {
               $result_span = "winning";
               //echo "<span style=\"color:green;\">Winning</span>";
@@ -87,7 +87,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
               $result_span = "incorrect";
               //echo "<span style=\"color:red;\">Loser</span>";
               addPoint($db,$pick['pick_id'],0,false);
-              updatePoints($db,$this_user_id,$this_season_year,$this_season_type,$this_week,false);
+              updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
             } else {
               $result_span = "losing";
               //echo "<span style=\"color:red;\">Losing</span>";
