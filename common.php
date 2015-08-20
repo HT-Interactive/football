@@ -10,16 +10,19 @@ extract($_REQUEST,EXTR_PREFIX_ALL,"this");
 
 
 //Set host-specifc
-$SITE_HOST = $_SERVER['HTTP_HOST'];
-$BASE_DIR = 'football';
-$FORUM_DIR = 'forum';
+$site_vars = explode('/',$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+$SITE_HOST = $site_vars[0];
+$BASE_DIR = $site_vars[1];
+//$THIS_DIR = 
+$THIS_PAGE = end($site_vars);
+//$FORUM_DIR = 'forum';
 $SITE_ROOT = '';
-$FORUM_ROOT = $FORUM_DIR.'/';
+$FORUM_ROOT = '';
 
 //determine current tab/page
 
-switch($_SERVER['PHP_SELF']) {
-	case('/'.$BASE_DIR.'/index.php'): //
+switch($THIS_PAGE) {
+	case('index.php'): //
 		if(isset($this_action)) {
 			switch($this_action) {
 				case('picks'):
@@ -36,9 +39,8 @@ switch($_SERVER['PHP_SELF']) {
 			$SITE_PAGE = 'picks';
 		}
 		break;
-	case('/'.$BASE_DIR.'/'.$FORUM_ROOT.'index.php'):
+	case('forum.php'):
 		$SITE_PAGE = 'forum';
-		$SITE_ROOT = '../';
 		break;
 	default:
 		$SITE_PAGE = 'picks';
