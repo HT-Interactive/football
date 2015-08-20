@@ -6,7 +6,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
 
   foreach($users as $user) {
   
-    $num_correct = getWeeklyPoints($db,$user['user_id'],$season_year,$season_type,$week);
+    $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
     $percentage = ($num_correct / $num_games) * 100;
     $percentages[$user['user_name']] = $percentage; 
 
@@ -53,7 +53,7 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
 
         foreach($users as $user) {
         
-          $num_correct = getWeeklyPoints($db,$user['user_id'],$season_year,$season_type,$week);
+          $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
           $score = getWeeklyScore($db,$user['user_id'],$season_year,$season_type,$week); //returns array with gsis_id and total score
           $percentage = ($num_correct / $num_games) * 100;
           $this_key = $user['user_name'];

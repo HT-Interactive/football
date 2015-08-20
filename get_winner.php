@@ -85,7 +85,7 @@ function updatePoints($db,$user_id,$group_id,$season_year,$season_type,$week,$ve
     }  
   } else { //no point total has been added so insert
 
-    $sql = "INSERT INTO points (points_id, user_id, group_id, season_year, season_type, week, points,wins) VALUES (NULL,'$user_id','$group_id','$season_year','$season_type','$week',$sum,NULL)";
+    $sql = "INSERT INTO points (points_id, user_id, group_id, season_year, season_type, week, points,winner) VALUES (NULL,'$user_id','$group_id','$season_year','$season_type','$week',$sum,NULL)";
     if(mysqli_query($db, $sql)) {
       if($verbose) { echo "Point total for user_id $user_id in group_id $group_id for $season_year $season_type Week $week inserted as $sum.<br>\n"; }
     } else {
