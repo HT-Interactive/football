@@ -43,7 +43,7 @@
     //echo "</form>";
 
   }
-  echo '<p class="navbar-text navbar-right">Group '.$this_group_id.' SID '.session_id().'</p>';
+  echo '<p class="navbar-text navbar-right">SID '.session_id().'</p>';
 
 ?>
         </div><!--/.nav-collapse -->
