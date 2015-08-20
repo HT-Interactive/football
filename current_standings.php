@@ -8,7 +8,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   
     $num_correct = getWeeklyPoints($db,$user['user_id'],$season_year,$season_type,$week);
     $percentage = ($num_correct / $num_games) * 100;
-    $percentages[$user['user_display_name']] = $percentage; 
+    $percentages[$user['user_name']] = $percentage; 
 
   }
 
@@ -36,7 +36,7 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
   $total_weeks = 0;
 
   foreach($users as $user) { //set each user to 0 wins
-    $season_wins[$user['user_display_name']] = 0;
+    $season_wins[$user['user_name']] = 0;
   }
   //print_r($season_wins);
 
@@ -56,7 +56,7 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
           $num_correct = getWeeklyPoints($db,$user['user_id'],$season_year,$season_type,$week);
           $score = getWeeklyScore($db,$user['user_id'],$season_year,$season_type,$week); //returns array with gsis_id and total score
           $percentage = ($num_correct / $num_games) * 100;
-          $this_key = $user['user_display_name'];
+          $this_key = $user['user_name'];
           $percentages[$this_key] = $percentage; 
           $scores[$this_key] = $score;
 
@@ -183,12 +183,12 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
 } //--End Function
 
   // get all users from mysql db
-  $users = getUsers($db);
+  $users = getUsers($db,$this_group_id);
 
-  echo "<h2>Current Week Standings <small>($current_season_year $current_season_type $current_week)</small></h2>";
+  echo "<h2>Current Week Standings for ".getGroupName($db,$this_group_id)." <small>($current_season_year $current_season_type $current_week)</small></h2>";
   displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week);
 
-  echo "<h2>Current Season Standings <small>($this_season_year)</small>";
+  echo "<h2>Current Season Standings for ".getGroupName($db,$this_group_id)." <small>($this_season_year)</small>";
   echo "<div class=\"btn-group\" role=\"group\" aria-label=\"...\">
   <button type=\"button\" id=\"ButtonSeasonWins\" class=\"btn btn-default\" onclick=\"showStandings(this,'wins')\"><span class=\"glyphicon glyphicon-star\" aria-hidden=\"true\"></span> Wins</button>
   <button type=\"button\" id=\"ButtonSeasonDollars\" class=\"btn btn-default\" style=\"background-color: #eee;\" onclick=\"showStandings(this,'dollars')\"><span class=\"glyphicon glyphicon-usd\" aria-hidden=\"true\"></span> </button>
@@ -200,12 +200,12 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
    
   //foreach($users as $user) {
   //  $i = $user['user_id'];
-  //  echo $user['user_display_name'].getUserWins($db,$i,$this_season_year)."<br>";
+  //  echo $user['user_name'].getUserWins($db,$i,$this_season_year)."<br>";
   //}
   //print_r($wins);
   
   //foreach($users as $user) {
-  //  echo $user['user_display_name'].getSeasonPoints($db,$user['user_id'],$this_season_year)."<br>";
+  //  echo $user['user_name'].getSeasonPoints($db,$user['user_id'],$this_season_year)."<br>";
   //}
   
   echo "<h2>Results By Week</h2>";
@@ -217,10 +217,11 @@ function displaySeasonStandings($db,$users,$season_year,$current_week) {
     $season_weeks = getWeeks($this_season_year,$display_type);
 
     foreach($season_weeks as $display_week) {
-
-      //$wins[] = getWeeklyWinner($db,$this_season_year,$display_type,$display_week);
-      echo "<h4>Week $display_week <small>($display_type $this_season_year)</small></h4>";
-      displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
+      if($display_week < $current_week) {
+        //$wins[] = getWeeklyWinner($db,$this_season_year,$display_type,$display_week);
+      	echo "<h4>Week $display_week <small>($display_type $this_season_year)</small></h4>";
+      	displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
+      }
     }
 
   }

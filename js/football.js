@@ -1,3 +1,7 @@
+function clearPassword() {
+	document.getElementById('inputPassword').value = " ";
+}
+
 function showHint(str) {
     if (str.length == 0) {
         document.getElementById("txtHint").innerHTML = "";
@@ -41,52 +45,41 @@ function checkName(str) {
     }
 }
 
-function pickTeam(element,u,g,y,t,wk,w) { //dom_element,user,game_id,year,type,week,winner
+function pickTeam(element,user,group,game,year,type,week,winner) { //dom_element,user,group,game_id,year,type,week,winner
 
   // alert(w);
   //element.style.color = "green";
   //home_color = document.getElementById(g+"_home").style.color;
   //away_color = document.getElementById(g+"_away").style.color;
-  if(element.id == g+"_home") { // user picked home team
-    document.getElementById(g+"_home").style.color = "green";
-    document.getElementById(g+"_home").style.background = "LightGray";
-    document.getElementById(g+"_away").style.color = "black";
-    document.getElementById(g+"_away").style.background = "#eee";
+  if(element.id == game+"_home") { // user picked home team
+    document.getElementById(game+"_home").style.color = "green";
+    document.getElementById(game+"_home").style.background = "LightGray";
+    document.getElementById(game+"_away").style.color = "black";
+    document.getElementById(game+"_away").style.background = "#eee";
   } else { // user picked away team
-    document.getElementById(g+"_away").style.color = "green";
-    document.getElementById(g+"_away").style.background = "LightGray";
-    document.getElementById(g+"_home").style.color = "black";
-    document.getElementById(g+"_home").style.background = "#eee";
+    document.getElementById(game+"_away").style.color = "green";
+    document.getElementById(game+"_away").style.background = "LightGray";
+    document.getElementById(game+"_home").style.color = "black";
+    document.getElementById(game+"_home").style.background = "#eee";
   }
-  //if(document.getElementById("score_span_"+g)) {
-  //  document.getElementById("score_span_"+g).style.visibility = "visible";
+  //if(document.getElementById("score_span_"+gm)) {
+  //  document.getElementById("score_span_"+gm).style.visibility = "visible";
   //}
-
+  
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
 
-          /*
-          if (xmlhttp.responseText == 0) {
-              
-              document.getElementById("registerButton").style.visibility = "visible";
-              document.getElementById("loginButton").style.visibility = "hidden";
-          } else {
-              
-              document.getElementById("registerButton").style.visibility = "hidden";
-              document.getElementById("loginButton").style.visibility = "visible";
-          }
-          */
       }
   }
-  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&season_year=" + y + "&season_type=" + t + "&week=" + wk + "&winner=" + w, true);
+  xmlhttp.open("GET", "pick_team.php?user_id=" + user + "&group_id=" + group + "&game_id=" + game + "&season_year=" + year + "&season_type=" + type + "&week=" + week + "&winner=" + winner, true);
   xmlhttp.send();
-
+ 
 }
 
-function enterScore(u,g,y,t,wk,s) {
-  alert('Score of '+s+' submitted.');
+function enterScore(user,group,game,year,type,week,score) {
+  alert('Score of '+score+' submitted.');
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -94,7 +87,7 @@ function enterScore(u,g,y,t,wk,s) {
 
       }
   }
-  xmlhttp.open("GET", "pick_team.php?user_id=" + u + "&game_id=" + g + "&season_year=" + y + "&season_type=" + t + "&week=" + wk + "&score=" + s, true);
+  xmlhttp.open("GET", "pick_team.php?user_id=" + user + "&group_id=" + group + "&game_id=" + game + "&season_year=" + year + "&season_type=" + type + "&week=" + week + "&score=" + score, true);
   xmlhttp.send();
 
 }

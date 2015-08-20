@@ -1,6 +1,6 @@
 <?php // Season Selector
 
-$my_points = getWeeklyPoints($db,$this_userid,$this_season_year,$this_season_type,$this_week); // get_winner.php
+$my_points = getWeeklyPoints($db,$this_user_id,$this_season_year,$this_season_type,$this_week); // get_winner.php
 $current_time = date("l h:iA T", time());
 
 ?>
@@ -13,9 +13,22 @@ $current_time = date("l h:iA T", time());
         <span class="icon-bar"></span>
       </button>
       
-    </div>
+    </div><!--/.navbar-header -->
     <p class="weekSelector-text">Your Picks for <?php echo "$this_season_year $this_season_type Week $this_week"; ?></p>
     <div id="navbar2" class="navbar-collapse collapse weekSelector">
+     <ul class="nav navbar-nav weekSelector">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?php echo getGroupName($db,$this_group_id); ?> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">Groups</li>
+            <?php
+              $groups = getGroups($db);
+              foreach($groups as $group) {
+                //echo '<li><a href="index.php?group_id='.$group['group_id'].'&season_year='.$this_season_year.'&season_type='.$this_season_type.'&week='.$this_week.'">'.$group['group_name'].'</a></li>';
+              }
+            ?>      
+          </ul>
+        </li>
       <ul class="nav navbar-nav weekSelector">
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?php echo $this_season_year; ?> <span class="caret"></span></a>
@@ -55,6 +68,6 @@ $current_time = date("l h:iA T", time());
         </li>
       </ul>
     </div><!--/.nav-collapse -->
-  </div>
+  </div><!--/container -->
 </nav>
 
