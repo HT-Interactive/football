@@ -38,7 +38,9 @@ body {
   border: 1px solid DarkGray;
   border-radius: 4px;
 }
-.teamCell:hover {
+.teamCell:hover,
+.teamCell.picked:hover,
+.teamCell.notPicked:hover {
   background-color: #e7e7e7;
 }
 /*.teamCell.away:hover {
