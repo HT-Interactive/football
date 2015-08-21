@@ -57,11 +57,11 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
         }
       //Selection formatting, remember to change the football.js pickTeam script to match
         if($this_away_team == $this_winner) {
-          $away_style = "color:green;background-color:LightGray;";
-          $home_style = "color:black;background-color:#eee";
+          $away_style = "picked";
+          $home_style = "notPicked";
         } elseif($this_home_team == $this_winner) {
-          $home_style = "color:green;background-color:LightGray;";
-          $away_style = "color:black;background-color:#eee";        
+          $home_style = "picked";
+          $away_style = "notPicked";        
         }
 
       // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
@@ -101,11 +101,15 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
         break;
 
       } else { 
+        $home_style = "notPicked";
+        $away_style = "notPicked";
         $result_str = "not picked";
         $this_score = "";
       }
     }
   } else { //user has made no picks so default to black
+    $home_style = "notPicked";
+    $away_style = "notPicked";
     $result_str = "not picked";
     $this_score = "";
   }
@@ -142,12 +146,14 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
         $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","exclamation-sign", "You haven't picked a winner for this game yet.", "orange");
         break;
   }
+  //if(!isset($away_style)) { $away_style = 'notPicked'; }
+  //if(!isset($home_style)) { $home_style = 'notPicked'; }
   
 //Game Row start
   echo "<tr>\n"; //start new row in table
 
 //Away Team Cell
-  echo "<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell away\">$this_away_team</div></td>\n";
+  echo "<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell away $away_style\">$this_away_team</div></td>\n";
 //Away Team Score
   echo "<td>";
   if($has_started) {
@@ -162,7 +168,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   }
   echo "</td>\n";
 //Home Team Cell
-  echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell home\">$this_home_team</div></td>\n";
+  echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell home $home_style\">$this_home_team</div></td>\n";
 //Result Cell
   echo "<td class=\"glyphCell\">";
   if(isset($result_span)) {

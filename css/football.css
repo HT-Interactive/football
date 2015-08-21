@@ -52,6 +52,14 @@ body {
     text-align: left;
     padding-left:  2px;
 }
+.teamCell.picked {
+    color:green;
+    background-color:LightGray;
+}
+.teamCell.notPicked {
+    color:black;
+    background-color:#eee
+}
 .scoreCell {
   font-size: small;
 }
