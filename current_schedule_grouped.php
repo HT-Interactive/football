@@ -8,7 +8,7 @@ $query = "SELECT * FROM game WHERE season_year='$this_season_year' AND season_ty
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
 // Get all of the users picks
-$pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$this_group_id'");
+$pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$this_group_id' AND season_year='$this_season_year' AND season_type='$this_season_type' AND week='$this_week'");
 while($user_pick = mysqli_fetch_array($pick_result)) {
   $user_picks[] = $user_pick;
 }
@@ -16,7 +16,7 @@ while($user_pick = mysqli_fetch_array($pick_result)) {
 //echo "<div class=\"row\">\n<div class=\"col-md-12\">\n<table class=\"pickTable\">\n";
 //echo "<div>\n<div>\n<table class=\"pickTable\">\n";
 if(!$timer_on) {
-  echo "<div class=\"alert alert-warning\" role=\"alert\">Game Start Timer Inactive</div>";
+  echo "<div class=\"alert alert-warning\" role=\"alert\">Game Start Timer Inactive</div>\n";
 }
 echo "<table class=\"pickTable\">\n";
 
@@ -37,9 +37,9 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   }
 
   if(!isset($last_day_of_week) || $this_day_of_week != $last_day_of_week) { //print date row
-    echo "<tr><td colspan=\"6\">";
+    echo "<tr>\n<td colspan=\"6\">";
     echo date('l, F j Y',strtotime($this_start_time));
-    echo "</td></tr>";
+    echo "</td>\n</tr>\n";
   }
 
   $last_day_of_week = $this_day_of_week; //set last day to this day for next iteration
@@ -67,64 +67,46 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
       // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
       // if it returns true, print correct or add to score,,,,
       // if false, print LOSER and don't ++score
-        if(strtotime($this_start_time) < time()) {
+        if($has_started) {
           if(getGameWinner($this_gsis_id) == $this_winner) {
-            if($this_finished == "t") {
-              $result_span = "correct";
+            if($has_finished) {
+              $result_str = "correct";
               //echo "<span style=\"color:green;\">Correct</span>"; 
               // add point to picks table for user and gsis_id
               addPoint($db,$pick['pick_id'],1,false);
               updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
             } else {
-              $result_span = "winning";
+              $result_str = "winning";
               //echo "<span style=\"color:green;\">Winning</span>";
             }
           } elseif(getGameWinner($this_gsis_id) == "tied") {
-              $result_span = "tied";
+              $result_str = "tied";
               //echo "<span style=\"color:blue;\">Tied</span>";
           } else {
             if($this_finished == "t") {
-              $result_span = "incorrect";
+              $result_str = "incorrect";
               //echo "<span style=\"color:red;\">Loser</span>";
               addPoint($db,$pick['pick_id'],0,false);
               updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
             } else {
-              $result_span = "losing";
+              $result_str = "losing";
               //echo "<span style=\"color:red;\">Losing</span>";
             }
           }
         } else {
-          $result_span = "";
+            
+            $result_str = "not started";
         }
-
-        switch($result_span) {
-          case "correct":
-            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","ok","green");
-            break;
-          case "incorrect":
-            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","remove", "red");
-            break;
-          case "winning":
-            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","arrow-up", "green");
-            break;
-          case "losing":
-            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","arrow-down", "red");
-            break;
-          case "tied":
-            $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" style=\"color:%s\"></span>","sort", "blue");
-            break;
-        }
+        
         break;
 
       } else { 
-        $home_style = "color:black;background-color:#eee";
-        $away_style = "color:black;background-color:#eee";
+        $result_str = "not picked";
         $this_score = "";
       }
     }
   } else { //user has made no picks so default to black
-    $home_style = "color:black;background-color:#eee";
-    $away_style = "color:black;background-color:#eee";
+    $result_str = "not picked";
     $this_score = "";
   }
   if($has_started && $timer_on) { // alert the user that it is too late
@@ -134,90 +116,80 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     $onclick_away_str = "pickTeam(this,'".$this_user_id."','".$this_group_id."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_away_team."')";
     $onclick_home_str = "pickTeam(this,'".$this_user_id."','".$this_group_id."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_home_team."')";
   }
-
+  if(!isset($result_str)) {
+      $result_str = "not picked";
+  }
+  switch($result_str) {
+    case "correct":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","ok","Correct Pick.","green");
+        break;
+    case "incorrect":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","remove", "Incorrect Pick.", "red");
+        break;
+    case "winning":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","arrow-up", "Your Pick is winning.", "green");
+        break;
+    case "losing":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","arrow-down","Your Pick is losing.", "red");
+        break;
+    case "tied":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","sort", "The teams are tied.", "blue");
+        break;
+    case "not started":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","time", "The game hasn't started yet.", "green");
+        break;
+    case "not picked":
+        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","exclamation-sign", "You haven't picked a winner for this game yet.", "orange");
+        break;
+  }
+  
 //Game Row start
-  echo "\t<tr>\n"; //start new row in table
+  echo "<tr>\n"; //start new row in table
 
 //Away Team Cell
-  echo "<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell\" style=\"text-align:right;$away_style;\">$this_away_team</div></td>";
+  echo "<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell away\">$this_away_team</div></td>\n";
 //Away Team Score
   echo "<td>";
   if($has_started) {
     echo "<span class=\"badge\">$this_away_score</span>";
   }
-  echo "</td>";
-  echo "<td>at</td>";
+  echo "</td>\n";
+  echo "<td>at</td>\n";
 //Home Team Score
   echo "<td>";
   if($has_started) {
     echo "<span class=\"badge\">$this_home_score</span>";
   }
-  echo "</td>";
+  echo "</td>\n";
 //Home Team Cell
-  echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell\" style=\"text-align:left;$home_style;\">$this_home_team</div></td>";
+  echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell home\">$this_home_team</div></td>\n";
 //Result Cell
-  echo "<td class=\"dayCell\">";
+  echo "<td class=\"glyphCell\">";
   if(isset($result_span)) {
     echo $result_span;
    }
-   echo "</td>";
+   echo "</td>\n";
 //Game Date
   //echo "<td>at</td>";
   //echo "<td class=\"dayCell\">$this_day_of_week</td>";
   //echo "<td class=\"timeCell\">";
   //echo date('F j Y',strtotime($this_start_time));
  // echo "</td>";
-  echo "<td class=\"dayCell\">at $this_start_time_EST</td>";
+  echo "<td class=\"dayCell\">at $this_start_time_EST\n";
+  echo "</td>\n";
+  
 //Pick Result
   echo "<td class=\"resultCell\">";
-  //echo "<button onclick=\"alert('Test')\">Test Me</button>";
-
-  if(isset($user_picks)) { //at least some picks in db
-
-    foreach($user_picks as $pick) {
-      if($pick['game_id'] == $this_gsis_id) { //user has already picked game so diplay winner
-        $this_winner = $pick['winner'];
-        
-      // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
-      // if it returns true, print correct or add to score,,,,
-      // if false, print LOSER and don't ++score
-        if(strtotime($this_start_time) < time()) {
-          if(getGameWinner($this_gsis_id) == $this_winner) {
-            if($this_finished == "t") {
-              echo "<span style=\"color:green;\">Correct</span>"; 
-              // add point to picks table for user and gsis_id
-              addPoint($db,$pick['pick_id'],1,false);
-              updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
-            } else {
-              echo "<span style=\"color:green;\">Winning</span>";
-            }
-          } elseif(getGameWinner($this_gsis_id) == "tied") {
-              echo "<span style=\"color:blue;\">Tied</span>";
-          } else {
-            if($this_finished == "t") {
-              echo "<span style=\"color:red;\">Loser</span>";
-              addPoint($db,$pick['pick_id'],0,false);
-              updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
-            } else {
-              echo "<span style=\"color:red;\">Losing</span>";
-            }
-          }
-        }
-       
-       
-      } else { // show count down timer
-        
-      }
-    }
-  }
-  echo "</td>";
+  if(!$has_started) echo "<small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small>\n";
+  echo "</td>\n";
   
-  echo "</tr>";
+  echo "</tr>\n";
+  //if(!$has_started) echo "<tr class=\"expiresIn\"><td colspan=\"7\"><small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small></td></tr>\n";
 
 } //End While
 
-echo "</table>";
-echo "<form class=\"form-inline\">";
+echo "</table>\n";
+echo "<form class=\"form-inline\">\n";
 echo "<div class=\"input-group input-group-sm\">
   <span class=\"input-group-addon\" id=\"basic-addon1\">Score of $this_away_team at $this_home_team</span>
   <input type=\"text\" id=\"score\" class=\"form-control\" name=\"score\" value=\"$this_score\" size=\"1\" />";
@@ -232,7 +204,7 @@ if(isset($this_gsis_id)) {
     <button class=\"btn btn-primary\" type=\"button\" onclick=\"enterScore('$this_user_id','$this_group_id','$this_gsis_id','$this_season_year','$this_season_type','$this_week',score.value)\">Submit</button>
     </span>";
   }
-
+  
   echo "</div></form>";
 
 } else {

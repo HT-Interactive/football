@@ -1,7 +1,7 @@
 <?php // Main Pick Selection Page
 
 include("mysql.php");
-include("get_winner.php");
+include("functions.php");
 
 function reconcileWeeklyWins($db,$users,$season_year,$current_week) {
   

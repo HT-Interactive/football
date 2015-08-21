@@ -2,7 +2,7 @@
 // Load Databases and Common functions
 require("mysql.php");
 include 'common.php';
-include("get_winner.php"); //Site Functions
+include("functions.php"); //Site Functions
  
 //try to guess the current week, function in get_winners
 guessCurrentWeek();

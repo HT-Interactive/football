@@ -36,7 +36,7 @@ function getWeeks($season_year,$season_type) {
 
 }
 
-$my_points = getWeeklyPoints($db,$this_userid,$this_season_year,$this_season_type,$this_week); // get_winner.php
+$my_points = getWeeklyPoints($db,$this_userid,$this_season_year,$this_season_type,$this_week); // functions.php
 $current_time = date("l h:iA T", time());
 
 ?>

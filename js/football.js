@@ -122,3 +122,22 @@ function showDebugging(element) {
     /* document.getElementById("DivSeasonDebugging").style.position = "static"; */
   }
 }
+
+function myTimer(element,start) {
+    var clock = document.getElementById(element)
+        , targetDate = new Date.parse(start); 
+    clock.innerHTML = countdown(targetDate).toString(); 
+    setInterval(function(){
+        clock.innerHTML = countdown(targetDate).toString();
+    }, 1000);
+}
+
+function startTimer(element,date) {
+    var clock = document.getElementById(element)
+        , targetDate = new Date(date);
+    clock.innerHTML = countdown(targetDate ).toString(); 
+    setInterval(function(){
+      clock.innerHTML = countdown(targetDate).toString();
+    }, 1000);
+
+}

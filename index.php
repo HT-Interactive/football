@@ -7,9 +7,10 @@
 
 // Load Databases and Common functions
 require("mysql.php");
-include 'common.php';
-include("get_winner.php"); //Site Functions
- 
+include('common.php');
+include("functions.php"); //Site Functions
+//include('include/test_include.php');
+
 //try to guess the current week, function in get_winners
 guessCurrentWeek();
 
@@ -37,7 +38,7 @@ guessCurrentWeek();
       } elseif(isset($_REQUEST['register'])) {
 				include("register.inc");
 			} else {
-				include("signin.inc");  	
+				include("signin.inc");
       }
 
 include 'footer.php';

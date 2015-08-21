@@ -1,6 +1,6 @@
 <?php // Season Selector
 
-$my_points = getWeeklyPoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week); // get_winner.php
+$my_points = getWeeklyPoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week); // functions.php
 $current_time = date("l h:iA T", time());
 
 ?>
