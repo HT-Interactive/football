@@ -185,7 +185,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   echo "</td>\n";
   
 //Pick Result
-  echo "<td class=\"resultCell\">";
+  echo "<td class=\"resultCell\" onclick=\"showTimer('".$this_gsis_id."-countdown')\">";
   if(!$has_started) echo "<small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small>\n";
   echo "</td>\n";
   

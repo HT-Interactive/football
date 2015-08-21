@@ -141,3 +141,10 @@ function startTimer(element,date) {
     }, 1000);
 
 }
+function showTimer(timer) {
+    if(timer.style.visibility == "visible") {
+        timer.style.visibility == "invisible";
+    } else {
+        timer.style.visibility == "visible";
+    }
+}
