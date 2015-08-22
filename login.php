@@ -142,9 +142,9 @@ function resetPasswordLink($user,$sid) {
     header("Location: http://".$goTo);
     exit;
 
-  } elseif(isset($_REQUEST['forgot'])) {
+  } elseif(isset($_REQUEST['forgot']) && $_REQUEST['forgot'] == 'pass') {
     
-    if(isset($_REQUEST['user_email'])) {    
+    if(isset($_REQUEST['user_email']) && $_REQUEST['user_email'] != '') {    
     	if(isset($_REQUEST['code'])) {
     	//compare code to 
     		if($_REQUEST['code'] == session_id()) {
@@ -195,7 +195,7 @@ function resetPasswordLink($user,$sid) {
       }//--End no code yet
     } else {
       //Redirect to login with no email notification
-      $error=urlencode("Please enter your email address and try again.");
+      $message=urlencode("Please enter your email address and try again.");
       $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']).'/index.php?action=login&forgot=password&message='.$message;
       header("Location: http://".$goTo);
       exit;

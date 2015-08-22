@@ -1,5 +1,7 @@
-function clearPassword() {
-	document.getElementById('inputPassword').value = " ";
+function resetPassword() {
+    document.getElementById('hiddenField').name = "forgot";
+    document.getElementById('hiddenField').value = "pass";
+	document.getElementById('form-signin').submit();
 }
 
 function showHint(str) {
