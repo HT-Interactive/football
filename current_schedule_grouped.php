@@ -1,18 +1,26 @@
 <?php // Main Pick Selection Page
 
 //Turn off timer for testing
-$timer_on = false;
+$timer_on = FALSE;
 
 // Performing SQL query for correct week
 $query = "SELECT * FROM game WHERE season_year='$this_season_year' AND season_type='$this_season_type' AND week='$this_week' ORDER BY start_time ASC";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
-// Get all of the users picks
-$pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$this_group_id' AND season_year='$this_season_year' AND season_type='$this_season_type' AND week='$this_week'");
-while($user_pick = mysqli_fetch_array($pick_result)) {
-  $user_picks[] = $user_pick;
+//Cross-check user's group seasons with this_season
+$group_result = mysqli_query($db, "SELECT * FROM g_seasons WHERE group_id='$this_group_id' AND season_year='$this_season_year' AND season_type='$this_season_type'");
+if(mysqli_num_rows($group_result) > 0) {
+    echo "The user is authorized to pick.";
+    $can_pick = TRUE;
+    // Get all of the users picks
+    $pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$this_group_id' AND season_year='$this_season_year' AND season_type='$this_season_type' AND week='$this_week'");
+    while($user_pick = mysqli_fetch_array($pick_result)) {
+      $user_picks[] = $user_pick;
+    }
+} else {
+    echo "The user is NOT authorized to pick.";
+    $can_pick = FALSE;
 }
-
 //echo "<div class=\"row\">\n<div class=\"col-md-12\">\n<table class=\"pickTable\">\n";
 //echo "<div>\n<div>\n<table class=\"pickTable\">\n";
 if(!$timer_on) {
@@ -113,7 +121,10 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     $result_str = "not picked";
     $this_score = "";
   }
-  if($has_started && $timer_on) { // alert the user that it is too late
+  if(!$can_pick) {
+    $onclick_away_str = "alert('Cant pick.')";
+    $onclick_home_str = "alert('Cant pick.')";
+  } elseif($has_started && $timer_on) { // alert the user that it is too late
     $onclick_away_str = "alert('It's too late to turn back now.')";
     $onclick_home_str = "alert('It's too late to turn back now.')";
   } else { // add pickTeam script to element    
@@ -174,7 +185,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell home $home_style\">$this_home_team</div></td>\n";
 //Result Cell
   echo "<td class=\"glyphCell\">";
-  if(isset($result_span)) {
+  if(isset($result_span) && $can_pick) {
     echo $result_span;
    }
    echo "</td>\n";
