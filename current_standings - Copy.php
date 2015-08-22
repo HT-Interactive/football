@@ -1,9 +1,5 @@
 <?php // Standings Display Script
 
-function subtractScore($user_score,$game_score) {
-    return(abs($user_score-$game_score));
-}
-
 function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   $num_games = getNumberOfGames($season_year,$season_type,$week);
   $percentages = array();
@@ -12,11 +8,11 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   
     $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
     $percentage = ($num_correct / $num_games) * 100;
-    //$percentages[$user['user_name']] = $percentage; 
-    $totals[$user['user_name']] = $num_correct;
+    $percentages[$user['user_name']] = $percentage; 
+    //$percentages[$user['user_name']] = $num_correct;
 
   }
-  /*
+
   arsort($percentages);
   $i=0;
   foreach($percentages as $u => $p) {
@@ -28,28 +24,15 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
     </div>
     </div>";
     $i++;
-  }*/
-  arsort($totals);
-  $i=0;
-  foreach($totals as $u => $n) {
-    echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">";
-    echo "<div class=\"progress-bar";
-    if($i==0 && $n > 0) { echo " progress-bar-success"; }
-    $length = ($n/$num_games)*100;
-    echo "\" role=\"progressbar\" aria-valuenow=\"$length\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $length%;\">
-    $n ($n/$num_games, $length%)
-    </div>
-    </div>";
-    $i++;
   }
 
 } //--End Function
 
-function displaySeasonStandings($db,$users,$season_year,$season_types,$current_week) {
+function displaySeasonStandings($db,$users,$season_year,$current_week) {
   
   // create an invisible DIV to hold debugging info
   echo "<div id=\"DivSeasonDebugging\" style=\"display: none;\">";
-  //$season_types = getSeasonTypes(); //get all types
+  $season_types = getSeasonTypes(); //get all types
   $season_wins = array(); //initialize win placeholder
   $total_weeks = 0;
 
@@ -61,97 +44,94 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   foreach($season_types as $season_type) {
 
     $season_weeks = getWeeks($season_year,$season_type);
-    echo "<p>Weeks this season:";
-    print_r($season_weeks);
-    echo "<p>Current week is: $current_week";
-    $total_weeks += count($season_weeks);
-    echo "<p>Week Count.: $total_weeks";
+
     foreach($season_weeks as $week) {
-      
+      $total_weeks += 1;
       if($week < $current_week) { //only count completed weeks
         $num_games = getNumberOfGames($season_year,$season_type,$week);
-        $totals = array();
+        $percentages = array();
         $scores = array();
 
         foreach($users as $user) {
         
-            $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
-            $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week); //returns array with gsis_id and total score
-            $this_key = $user['user_name'];
-            $this_game_id = $score[0];
-            $totals[$this_key] = $num_correct; 
-            $scores[$this_key] = $score[1];
-            echo "<p>User ".$this_key." has ".$totals[$this_key]." and a guess of score ".$scores[$this_key]." for game ".$this_game_id;
-            //print_r($score);
-            echo "</p>";
-            $percentage = ($num_correct / $num_games) * 100;
-        }     
-            echo "<br>Scores array<br>";
-            print_r($scores);
-            echo "<br>Unsorted Totals array:<br>";
-            print_r($totals);
+          $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
+          $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week); //returns array with gsis_id and total score
+          $percentage = ($num_correct / $num_games) * 100;
+          $this_key = $user['user_name'];
+          $percentages[$this_key] = $percentage; 
+          $scores[$this_key] = $score;
 
-            arsort($totals);
+        }//--User
+        echo "<br>Scores array<br>";
+        print_r($scores);
+        echo "<br>Unsorted Percents array:<br>";
+        print_r($percentages);
+        arsort($percentages);
 
-            $top_score = max($totals);
-            echo "<br>Sorted Totals array:<br>";
-            print_r($totals);
-            echo "<br>with a Top Score of $top_score<br>";
+        $max_p = max($percentages);
+        echo "<br>Sorted Percents array:<br>";
+        print_r($percentages);
+        echo "<br>with a max P of $max_p<br>";
 
-            if(current($totals) == next($totals)) { //there is a tie
-              reset($totals);
-              echo "<p>It's a tie!</p>";
-              do { //remove the low scores
-                if(current($totals) != $top_score) {
-                  array_pop($totals);
-                }
-              } while(next($totals));
-              echo "<br>Possible winners after culling:<br>";
-              print_r($totals);
-  
-              echo "<br>Score Array:<br>";
-              print_r($scores);
-
-              if(isset($this_game_id)) {
-                $game_score = getGameScore($this_game_id);
-              } else {
-                $game_score = 0;
-              }
-              echo "<br>Subtract Actual Game score of $game_score.<br>";
-          
-              foreach($scores as $u => $s) {
-                   $score_diffs[$u] = abs($s - $game_score);
-              }
-         
-              echo "<br>Unsorted Score Differentials:<br>";
-              print_r($score_diffs);
-              asort($score_diffs);
-              echo "<br>Sorted Score Differentials:<br>";
-              print_r($score_diffs);
-              $lowest_diff = max($score_diffs);
-              echo "<br>with a Lowest Diff of $lowest_diff<br>";
-
-              if(current($score_diffs) == next($score_diffs)) { //there is a another tie
-                $winner = key($score_diffs); //flip a proverbial coin
-                echo $winner." has won the second tie breaker through a random selection process.<br>";
-                $season_wins[$winner] += 1;
-                echo "<p>".print_r($season_wins)."</p>";
-              } else {
-                  reset($score_diffs);
-                  echo key($score_diffs)." has won the tie breaker with a score differential of $lowest_diff.<br>";
-                  $season_wins[key($score_diffs)] += 1;
-                  echo "<p>".print_r($season_wins)."</p>";
-              }
+        if(current($percentages) == next($percentages)) { //there is a tie
+          reset($percentages);
+          do { //remove the low scores
+            if(current($percentages) != $max_p) {
+              array_shift($percentages);
+            }
+          } while(next($percentages));
+          echo "<br>Possible winners after culling:<br>";
+          print_r($percentages);
+          //pull game id out of score array      
+          foreach($scores as $u => $s) {
+            if($s[0] > 0) { 
+              $g_id = $s[0]; 
             } else {
-              reset($totals);
-              echo key($totals)." has won on picks.<br>";
-              $season_wins[key($totals)] += 1;
-              echo "<p>".print_r($season_wins)."</p>";
-            }//End Tie Determination
-        
-      }//--End IF current week check
+              //need some other tie breaker
+
+            }
+          }
+          if(isset($g_id)) {
+            $game_score = getGameScore($g_id);
+          } else {
+            $game_score = 0;
+          }
+          foreach($scores as $u => $s) {
+            $s[1] -= $game_score;
+          }
+          $scores = array_intersect_key($scores,$percentages); //remove all but possible winners
+          array_multisort($scores, SORT_ASC, SORT_NUMERIC);
+
+          echo key($scores)." has won tie breaker.<br>";
+
+          $season_wins[key($scores)] +=1;
+
+
+        } else {
+          reset($percentages);
+          echo key($percentages)." has won on picks.<br>";
+          $season_wins[key($percentages)] += 1;
+        }
+        do {
+          if(current($percentages) != $max_p) {
+          echo "<br>percent".current($percentages)." popped.";
+          array_pop($percentages);
+          }
+        } while(next($percentages));
+        reset($percentages);
+        echo "Winner(s) of Week $week should be:<br>";
+        print_r($percentages);
+        echo "<br>count=".count($percentages)."key=".key($percentages);
+
+        if(count($percentages) > 1) { //must be a tie 
+          
+        } elseif(count($percentages) == 1) { //add a win for the user
+          echo key($percentages)." has won on picks.<br>";
+          $season_wins[key($percentages)] += 1;
+        }
+      }//--End IF
     }//--Week
-  }//End foreach Season
+  }//--Season
   echo "</div>"; //end debug
   //print_r($season_wins);
   //echo "<div style=\"border: 1px solid green;\">";
@@ -164,7 +144,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
     echo "<div class=\"progress-bar";
     if($i==0 && $p > 0) { echo " progress-bar-success"; }
     echo "\" role=\"progressbar\" aria-valuenow=\"$p\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $p%\">
-    $w ($w/$total_weeks, $p%)
+    $w
     </div>
     </div>";
     $i++;
@@ -215,9 +195,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   <button type=\"button\" id=\"ButtonSeasonDollars\" class=\"btn btn-default\" style=\"background-color: #eee;\" onclick=\"showStandings(this,'dollars')\"><span class=\"glyphicon glyphicon-usd\" aria-hidden=\"true\"></span> </button>
   <button type=\"button\" id=\"ButtonSeasonWins\" class=\"btn btn-default btn-xs\" onclick=\"showDebugging(this)\"><span class=\"glyphicon glyphicon-warning-sign\" aria-hidden=\"true\"></span> Debug</button>
   </div></h2>";
-  $these_types[] = getGroupSeasonTypes($db,$this_group_id,$this_season_year);
-  //print_r($these_types);
-  displaySeasonStandings($db,$users,$this_season_year,$these_types,$current_week);
+  displaySeasonStandings($db,$users,$this_season_year,$current_week);
   
   //print_r($season_types);
    

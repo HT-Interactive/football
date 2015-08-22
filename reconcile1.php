@@ -3,7 +3,7 @@
 include("mysql.php");
 include("functions.php");
 
-function reconcileWeeklyWins($db,$users,$group,$season_year,$current_week) {
+function reconcileWeeklyWinners($db,$group_id,$season_year,$week) {
   
   // create an invisible DIV to hold debugging info
   echo "<div id=\"DivSeasonDebugging\" style=\"display: none;\">";
@@ -122,74 +122,22 @@ function reconcileWeeklyWins($db,$users,$group,$season_year,$current_week) {
   echo "</div>"; //end debug
 } //--End Function
 
-$this_group_id = 1;
 
-// get all users from mysql db
-$users = getUsers($db);
-foreach($users as $user) {
-  $this_user_id = $user['user_id'];
-  echo "<p>User ".$user['user_name']."(id $this_user_id)</p>";
+//Use SQL Union to find seasons that belong to any group
+//$season_years = getSeasonYears(); //get all years
 
-  // Get all of the users picks
-  $pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$this_group_id'");
-  while($user_pick = mysqli_fetch_array($pick_result)) {
-    $user_picks[] = $user_pick;
-  }
-
-  // Performing SQL query for all games
-  $query = "SELECT * FROM game";
-  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-
-  while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
-
-    extract($games,EXTR_PREFIX_ALL,"this"); //load all game variables from db_array
-
-    if(strtotime($this_start_time) < time()) {
-      $has_started = true;
-    } else {
-      $has_started = false;
-    }
-    if($this_finished=="t") {
-      $has_finished = true;
-    }else {
-      $has_finished = false;
-    }
-
-
-  
-    if(isset($user_picks)) { //at least some picks in db
-
-      foreach($user_picks as $pick) {
-        if($pick['game_id'] == $this_gsis_id) { //user has already picked game so diplay winner
-          $this_winner = $pick['winner'];
-          
-        // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
-        // if it returns true, print correct or add to score,,,,
-        // if false, print LOSER and don't ++score
-          if(strtotime($this_start_time) < time()) {
-            if(getGameWinner($this_gsis_id) == $this_winner) {
-              if($this_finished == "t") {
-                //echo "<span style=\"color:green;\">Correct</span>"; 
-                // add point to picks table for user and gsis_id
-                addPoint($db,$pick['pick_id'],1,true);
-                updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,true);
-              } 
-            } else {
-              if($this_finished == "t") {
-                //echo "<span style=\"color:red;\">Loser</span>";
-                addPoint($db,$pick['pick_id'],0,true);
-                updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,true);
-              } 
-            }
-          }
-        } 
-      }
-    }
-  } //End While
-} //End User Foreach
-
-$season_years = getSeasonYears(); //get all years
-$season_types = getSeasonTypes(); //get all types
+//$season_types = getSeasonTypes(); //get all types
+$sql = "SELECT season_year, season_type, group_id FROM picks\n"
+     . "UNION\n"
+     . "SELECT season_year, season_type, group_id FROM g_seasons";
+$result = mysqli_query($db, $sql) or die(mysqli_error_list($db));
+while($row = mysqli_fetch_array($result)) {
+    $season_years[] = $row['season_year'];
+    $season_types[] = $row['season_type'];
+    $groups[] = $row['group_id'];
+}
+//print_r($season_years);
+//print_r($season_types);
 
 foreach($season_years as $season_year) {
   foreach($season_types as $season_type) {
@@ -199,19 +147,27 @@ foreach($season_years as $season_year) {
     foreach($season_weeks as $week) {
 
       //$wins[] = getWeeklyWinner($db,$this_season_year,$display_type,$display_week);
-        $groups = getGroups($db);
+        //$groups = getGroups($db);
         foreach($groups as $group) {
-            $this_group_id  = $group['group_id'];
-            "<h4>Reconciling $season_year $season_type Week $week for Group $this_group_id</h4>";
-    	    reconcileWeeklyWins($db,$users,$this_group_id,$season_year,$season_type,$week);
+            "<h4>Reconciling $season_year $season_type Week $week for Group $group</h4>";
+    	    reconcileWeeklyPoints($db,$group,$season_year,$season_type,$week);
         }
       
     }
   }
 }    
-// Free resultset
-pg_free_result($result);
 
-// Closing connection
-pg_close($db_nfl);
+//SQL INNER JOIN example to return all user picks for the seasons defined by g_seasons
+/*
+$sql = "SELECT * \n"
+    . "FROM \n"
+    . " picks \n"
+    . " INNER JOIN\n"
+    . " groups \n"
+    . " ON picks.group_id=groups.group_id\n"
+    . " INNER JOIN\n"
+    . " g_seasons \n"
+    . " ON groups.group_id=g_seasons.group_id WHERE user_id='$user_id'";
+ */
+
 ?>

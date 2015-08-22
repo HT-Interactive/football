@@ -38,6 +38,23 @@ function guessCurrentWeek() {
   }
 
 }
+function getSeasonYearTypes($db,$group_id) {
+    //Use SQL Union to find seasons that belong to any group
+    //$season_years = getSeasonYears(); //get all years
+
+    //$season_types = getSeasonTypes(); //get all types
+    $sql = "SELECT season_year, season_type, group_id FROM picks\n"
+         . "UNION\n"
+         . "SELECT season_year, season_type, group_id FROM g_seasons";
+    $result = mysqli_query($db, $sql) or die(mysqli_error_list($db));
+    while($row = mysqli_fetch_array($result)) {
+        $season_years[] = $row['season_year'];
+        $season_types[] = $row['season_type'];
+        $groups[] = $row['group_id'];
+    }
+    return [$groups, $season_years, $season_types];
+}
+
 
 function addWin($db,$u,$s,$t,$w,$verbose) {
 
@@ -63,6 +80,100 @@ function addPoint($db,$id,$p,$verbose) {
 
 }
 
+function reconcilePoints($db,$user_id,$group_id,$season_year,$season_type,$week,$verbose) {
+    // check picks table for games that match season/week and sum them
+    //$sql = "SELECT SUM(points) AS points_sum FROM picks WHERE user_id='$user_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'"; 
+    //$result = mysqli_query($db,$sql);
+    //$row = mysqli_fetch_assoc($result); 
+    //$sum = $row['points_sum'];
+    //echo $sum;
+    $this_points_id = updatePoints($db,$user_id,$group_id,$season_year,$season_type,$week,$verbose); //piggy pack on update script on final time
+    $sql = "UPDATE points SET reconciled=1 WHERE points_id='$this_points_id'";
+    echo "<p>$sql</p>";
+    //$result = mysqli_query($db,$sql);
+    if(mysqli_query($db,$sql)) {
+        if($verbose) { echo "Point total id <b>$this_points_id</b> for user_id <b>$user_id</b> in group_id <b>$group_id</b> for <b>$season_year</b> <b>$season_type</b> Week <b>$week</b> has been <b>RECONCILED</b>.<br>\n"; }
+    } else {
+        echo mysqli_error($db); 
+    }  
+ 
+}
+
+function reconcileWeeklyPoints($db,$group_id,$season_year,$season_type,$week) {
+    // get users from mysql db that belong to the group
+    $users = getUsers($db, $group_id);
+    foreach($users as $user) {
+      $this_user_id = $user['user_id'];
+      echo "<p>User ".$user['user_name']."(id $this_user_id)</p>";
+
+      // Get all of the users picks for the season year type week
+      //$pick_result = mysqli_query($db, "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$group_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'");
+      //$sql = "SELECT * FROM picks WHERE user_id='$this_user_id' AND group_id='$group_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'";
+      $sql = "SELECT picks.pick_id, picks.game_id, picks.winner, points.reconciled\n"
+           . "FROM picks \n"
+           . "LEFT JOIN points \n"
+           . "ON points.user_id=picks.user_id\n"
+           . "WHERE picks.user_id='$this_user_id' AND picks.group_id='$group_id' AND picks.season_year='$season_year' AND picks.season_type='$season_type' AND picks.week='$week' AND points.reconciled is NULL";
+      echo "<p>$sql</p>";
+      $pick_result = mysqli_query($db, $sql) or die(mysqli_error($db));
+      while($user_pick = mysqli_fetch_array($pick_result)) {
+        $user_picks[] = $user_pick;
+      }
+
+      // Performing SQL query for all games
+      $query = "SELECT * FROM game WHERE season_year='$season_year' AND season_type='$season_type' AND week='$week'";
+      $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+
+      while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
+
+        extract($games,EXTR_PREFIX_ALL,"this"); //load all game variables from db_array
+
+        if(strtotime($this_start_time) < time()) {
+          $has_started = true;
+        } else {
+          $has_started = false;
+        }
+        if($this_finished=="t") {
+          $has_finished = true;
+        }else {
+          $has_finished = false;
+        }
+
+
+  
+        if(isset($user_picks)) { //at least some picks in db
+
+          foreach($user_picks as $pick) {
+
+               if($pick['game_id'] == $this_gsis_id) { //user has already picked game so set winner
+                    $this_winner = $pick['winner'];         
+                    // pass this_winner to a script that checks the actual_winner for the jesus_id in the nfl_db
+                    // if it returns true, print correct or add to score,,,,
+                    // if false, print LOSER and don't ++score
+                    if(strtotime($this_start_time) < time()) { //game started
+                        if(getGameWinner($this_gsis_id) == $this_winner) {
+                            if($this_finished == "t") {
+                                //echo "<span style=\"color:green;\">Correct</span>"; 
+                                // add point to picks table for user and gsis_id
+                                addPoint($db,$pick['pick_id'],1,true);
+                                reconcilePoints($db,$this_user_id,$group_id,$this_season_year,$this_season_type,$this_week,true);
+                            }      
+                        } else {
+                            if($this_finished == "t") {
+                                //echo "<span style=\"color:red;\">Loser</span>";
+                                addPoint($db,$pick['pick_id'],0,true);
+                                reconcilePoints($db,$this_user_id,$group_id,$this_season_year,$this_season_type,$this_week,true);
+                            } 
+                        }
+                    }
+                } 
+          }//End Foreach pick
+        }
+      } //End While
+    } //End User Foreach
+
+}//END FUNCTION
+
 function updatePoints($db,$user_id,$group_id,$season_year,$season_type,$week,$verbose) {
   // check picks table for games that match season/week and sum them
   //$sql = "SELECT SUM(points) AS points_sum FROM picks WHERE user_id='$user_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'"; 
@@ -80,6 +191,7 @@ function updatePoints($db,$user_id,$group_id,$season_year,$season_type,$week,$ve
     //$result = mysqli_query($db,$sql);
     if(mysqli_query($db,$sql)) {
       if($verbose) { echo "Point total for user_id $user_id in group_id $group_id for $season_year $season_type Week $week updated to $sum.<br>\n"; }
+      return mysqli_insert_id($db);
     } else {
       echo mysqli_error($db); 
     }  
@@ -88,6 +200,7 @@ function updatePoints($db,$user_id,$group_id,$season_year,$season_type,$week,$ve
     $sql = "INSERT INTO points (points_id, user_id, group_id, season_year, season_type, week, points,winner) VALUES (NULL,'$user_id','$group_id','$season_year','$season_type','$week',$sum,NULL)";
     if(mysqli_query($db, $sql)) {
       if($verbose) { echo "Point total for user_id $user_id in group_id $group_id for $season_year $season_type Week $week inserted as $sum.<br>\n"; }
+      return mysqli_insert_id($db);
     } else {
       echo mysqli_error($db);
     }
@@ -239,17 +352,26 @@ function getUsers($db,$group_id = 'all') { // get all users from mysql db
 }
 
 function getGroups($db,$user_id = 'all') {
-
-	if($user_id == 'all') {
-  	$result = mysqli_query($db, "SELECT * FROM groups");
-  } else {
-  	$result = mysqli_query($db, "SELECT * FROM groups WHERE user_id='$user_id'");
-  }
-  while($group = mysqli_fetch_array($result)) {
-    $groups[] = $group;
-  }
+    if($user_id == 'all') {
+  	    $result = mysqli_query($db, "SELECT * FROM groups");
+    } else {
+  	    $result = mysqli_query($db, "SELECT * FROM groups WHERE user_id='$user_id'");
+    }
+    while($group = mysqli_fetch_array($result)) {
+        $groups[] = $group;
+    }
 	mysqli_free_result($result);
-  return $groups;
+    return $groups;
+}
+
+function getGroupSeasonTypes($db,$group_id,$season_year) {
+    $sql = "SELECT season_type FROM g_seasons WHERE group_id = '$group_id' AND season_year = '$season_year'";
+    $result = mysqli_query($db,$sql);
+    while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)) {
+        $these_season_types = $row['season_type'];
+    }
+	mysqli_free_result($result);
+    return $these_season_types;
 }
 
 function getGroupName($db,$group_id) {
@@ -297,7 +419,15 @@ function getWeeks($season_year,$season_type) {
     $display_weeks = [];
   }
   return $display_weeks;
+}
+function getNumWeeks($season_year,$season_type) {
 
+  $query = "SELECT DISTINCT COUNT(week) as num_weeks FROM game WHERE season_type='$season_type' AND season_year='$season_year'";
+  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+  //echo $result;
+  //echo "$season_year $season_type";
+ 
+  return pg_num_rows($result);
 }
 
 function calculateWinnings($users,$weeks,$wins,$anty) {

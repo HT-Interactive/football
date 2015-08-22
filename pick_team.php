@@ -38,7 +38,11 @@ if($this_pick = mysqli_fetch_array($pick_result)) { // User has already picked s
 
   if(isset($_REQUEST['score'])) {
     $this_score = $_REQUEST['score'];
-    $sql = "UPDATE picks SET score='$this_score' WHERE user_id='$this_user_id' AND game_id='$this_game_id' AND group_id='$this_group_id'";
+    if($this_score == '') { 
+        $sql = "UPDATE picks SET score=NULL WHERE user_id='$this_user_id' AND game_id='$this_game_id' AND group_id='$this_group_id'"; 
+    } else {
+        $sql = "UPDATE picks SET score='$this_score' WHERE user_id='$this_user_id' AND game_id='$this_game_id' AND group_id='$this_group_id'";
+    }
       
     if(mysqli_query($db,$sql)) {
       echo "Score Entered";
