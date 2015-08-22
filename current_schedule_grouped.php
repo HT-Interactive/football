@@ -123,28 +123,31 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   if(!isset($result_str)) {
       $result_str = "not picked";
   }
+  //$span_str = 
   switch($result_str) {
     case "correct":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","ok","Correct Pick.","green");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>",$this_gsis_id,"ok","Correct Pick.","green");
         break;
     case "incorrect":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","remove", "Incorrect Pick.", "red");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>",$this_gsis_id,"remove", "Incorrect Pick.", "red");
         break;
     case "winning":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","arrow-up", "Your Pick is winning.", "green");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>",$this_gsis_id,"arrow-up", "Your Pick is winning.", "green");
         break;
     case "losing":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","arrow-down","Your Pick is losing.", "red");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>",$this_gsis_id,"arrow-down","Your Pick is losing.", "red");
         break;
     case "tied":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","sort", "The teams are tied.", "blue");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>",$this_gsis_id,"sort", "The teams are tied.", "blue");
         break;
     case "not started":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","time", "The game hasn't started yet.", "green");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>",$this_gsis_id,"time", "The game hasn't started yet.", "green");
         break;
     case "not picked":
-        $result_span = sprintf("<span class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\"></span>","exclamation-sign", "You haven't picked a winner for this game yet.", "orange");
+        $result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"%s\" style=\"color:%s;\" onmouseover=\"showTimer('%s_expiresIn')\" onmouseout=\"hideTimer('%s_expiresIn')\"></span>",$this_gsis_id,"exclamation-sign", "You haven't picked a winner for this game yet.", "orange",$this_gsis_id,$this_gsis_id);
+        //$result_span = sprintf("<span id=\"%s_glyph\" class=\"glyphicon glyphicon-%s\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"left\" style=\"color:%s;\" onmouseover=\"startTimer('%s_glyph','%s')\"></span>",$this_gsis_id,"exclamation-sign","orange",$this_gsis_id,date(DATE_RFC2822,strtotime($this_start_time)));
         break;
+
   }
   //if(!isset($away_style)) { $away_style = 'notPicked'; }
   //if(!isset($home_style)) { $home_style = 'notPicked'; }
@@ -181,16 +184,20 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   //echo "<td class=\"timeCell\">";
   //echo date('F j Y',strtotime($this_start_time));
  // echo "</td>";
-  echo "<td class=\"dayCell\">at $this_start_time_EST\n";
+  echo "<td id=\"$this_gsis_id"."_time\" class=\"dayCell\" onclick=\"showTimer('".$this_gsis_id."_expiresIn')\">at $this_start_time_EST\n";
+  if(!$has_started) echo "<div id=\"".$this_gsis_id."_expiresIn\" class=\"expiresIn\" style=\"display: none;\">Game Locks Out in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></div></td><td colspan=\"2\">\n";
   echo "</td>\n";
   
 //Pick Result
-  echo "<td class=\"resultCell\" onclick=\"showTimer('".$this_gsis_id."-countdown')\">";
-  if(!$has_started) echo "<small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small>\n";
+  echo "<td id=\"$this_gsis_id"."_result\" class=\"resultCell\">";
+  //if(!$has_started) echo "<img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."_glyph','".date(DATE_RFC2822,strtotime($this_start_time))."','You haven't picked a winner for this game yet.')\">\n";
+  //if(!$has_started) echo "<div id=\"".$this_gsis_id."_expiresIn\" class=\"alert alert-warning expiresIn\" role=\"alert\"><small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small></div></td><td colspan=\"2\"></td></tr>\n";
+  //if(!$has_started) echo "<div id=\"".$this_gsis_id."_expiresIn\" class=\"alert alert-warning expiresIn\" role=\"alert\"><small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small></div></td><td colspan=\"2\"></td></tr>\n";
+
   echo "</td>\n";
   
   echo "</tr>\n";
-  //if(!$has_started) echo "<tr class=\"expiresIn\"><td colspan=\"7\"><small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small></td></tr>\n";
+  //if(!$has_started) echo "<tr><td colspan=\"5\"><div id=\"".$this_gsis_id."-expiresIn\" class=\"alert alert-warning expiresIn\" role=\"alert\"><small>Expires in <span id=\"".$this_gsis_id."-countdown\"><img src=\"timer.png\" onload=\"startTimer('".$this_gsis_id."-countdown','".date(DATE_RFC2822,strtotime($this_start_time))."')\"></span></small></div></td><td colspan=\"2\"></td></tr>\n";
 
 } //End While
 

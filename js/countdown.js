@@ -1177,28 +1177,28 @@ function(module) {
 	 * @const
 	 * @type {number}
 	 */
-	countdown.MILLISECONDS = MILLISECONDS;
+	countdown.MILLISECONDS = MSEC;
 
 	/**
 	 * @public
 	 * @const
 	 * @type {number}
 	 */
-	countdown.SECONDS = SECONDS;
+	countdown.SECONDS = SEC;
 
 	/**
 	 * @public
 	 * @const
 	 * @type {number}
 	 */
-	countdown.MINUTES = MINUTES;
+	countdown.MINUTES = MINS;
 
 	/**
 	 * @public
 	 * @const
 	 * @type {number}
 	 */
-	countdown.HOURS = HOURS;
+	countdown.HOURS = HRS;
 
 	/**
 	 * @public

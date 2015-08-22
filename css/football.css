@@ -72,8 +72,16 @@ body {
   font-size: x-small;
 }
 .expiresIn {
-    text-align:  center;
-    margin-top:  -50px;
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    border-radius: 2px;
+    font-weight: bold;
+    word-wrap: break-word;
+    width: auto;
+    padding: 0px;
+    margin-right: 2px;
+    float: left; 
 }
 .weekSelector > li > a {
   padding-top: 4px;
