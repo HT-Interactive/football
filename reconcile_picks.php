@@ -9,7 +9,7 @@
 //check to see if the game has finished
 //if yes, mark the Pick as Reconciled; else, exit; (or loop back)
 include("mysql.php");
-//include_once("functions.php");
+include_once("functions.php");
 
 //get all non-reconciled PICKS   
 // Get all of the users picks
