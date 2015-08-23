@@ -8,13 +8,13 @@
 //if yes, set picks.points to 1; else, set picks.points to 0 
 //check to see if the game has finished
 //if yes, mark the Pick as Reconciled; else, exit; (or loop back)
-//include("mysql.php");
+include("mysql.php");
 //include_once("functions.php");
 
 //get all non-reconciled PICKS   
 // Get all of the users picks
 $sql = "SELECT * FROM picks WHERE reconciled IS NULL";
-$pick_result = mysqli_query($db, $sql);
+$pick_result = mysqli_query($db, $sql) or die(mysqli_error($db));
 while($user_pick = mysqli_fetch_array($pick_result)) {
     extract($user_pick,EXTR_PREFIX_ALL,"user");
 //$user_pick['pick_id'],$user_pick['group_id']
