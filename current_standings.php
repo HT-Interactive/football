@@ -4,6 +4,22 @@ function subtractScore($user_score,$game_score) {
     return(abs($user_score-$game_score));
 }
 
+function displayStandings($totals,$num_games,$units) {
+  arsort($totals);
+  $i=0;
+  foreach($totals as $u => $n) {
+    echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">";
+    echo "<div class=\"progress-bar";
+    if($i==0 && $n > 0) { echo " progress-bar-success"; }
+    $length = ($n/$num_games)*100;
+    echo "\" role=\"progressbar\" aria-valuenow=\"$length\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $length%;\">
+    $n ($n/$num_games, $length%)
+    </div>
+    </div>";
+    $i++;
+  }
+}
+
 function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   $num_games = getNumberOfGames($season_year,$season_type,$week);
   $percentages = array();
@@ -55,7 +71,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   $total_weeks = 0;
          
   //check if week is reconciled yet
-  $sql = "SELECT user_id, COUNT(winner) as wins FROM points WHERE season_year=2015 AND group_id=1 AND reconciled IS NOT NULL GROUP BY user_id ORDER BY wins DESC";
+  $sql = "SELECT user_id, COUNT(winner) as wins FROM points WHERE season_year='$season_year' AND group_id='$this_group_id' AND reconciled IS NOT NULL GROUP BY user_id ORDER BY wins DESC";
   $result = mysqli_query($db,$sql);
   $row_cnt = mysqli_num_rows($result);
   $row = mysqli_fetch_array($result,MYSQL_ASSOC);
@@ -190,8 +206,9 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
       }//End foreach Season
    }//END reconciliation check
    
-   //Display winner graph
     echo "</div>"; //end debug
+
+//Display winner graph
     //print_r($season_wins);
     //echo "<div style=\"border: 1px solid green;\">";
     echo "<div id=\"DivSeasonWins\">";
