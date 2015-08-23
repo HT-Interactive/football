@@ -382,7 +382,12 @@ function getGroups($db,$user_id = 'all') {
     if($user_id == 'all') {
   	    $result = mysqli_query($db, "SELECT * FROM groups");
     } else {
-  	    $result = mysqli_query($db, "SELECT * FROM groups WHERE user_id='$user_id'");
+  	    $sql = "SELECT *\n"
+            . "FROM groups\n"
+            . "INNER JOIN g_members\n"
+            . "ON groups.group_id=g_members.group_id\n"
+            . "WHERE g_members.user_id='$user_id'";
+        $result = mysqli_query($db, $sql);
     }
     while($group = mysqli_fetch_array($result)) {
         $groups[] = $group;

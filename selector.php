@@ -22,9 +22,9 @@ $current_time = date("l h:iA T", time());
           <ul class="dropdown-menu">
             <li class="dropdown-header">Groups</li>
             <?php
-              $groups = getGroups($db);
+              $groups = getGroups($db,$this_user_id);
               foreach($groups as $group) {
-                //echo '<li><a href="index.php?group_id='.$group['group_id'].'&season_year='.$this_season_year.'&season_type='.$this_season_type.'&week='.$this_week.'">'.$group['group_name'].'</a></li>';
+                echo '<li><a href="index.php?group_id='.$group['group_id'].'&season_year='.$this_season_year.'&season_type='.$this_season_type.'&week='.$this_week.'">'.$group['group_name'].'</a></li>';
               }
             ?>      
           </ul>
