@@ -30,7 +30,7 @@ if($this_pick = mysqli_fetch_array($pick_result)) { // User has already picked s
     $sql = "UPDATE picks SET winner='$this_winner' WHERE user_id='$this_user_id' AND game_id='$this_game_id' AND group_id='$this_group_id'";
       
     if(mysqli_query($db,$sql)) {
-      echo "Pick updated";
+      echo "Pick updated to $this_winner";
     } else {
       echo mysqli_error($db); 
     } 
@@ -45,20 +45,21 @@ if($this_pick = mysqli_fetch_array($pick_result)) { // User has already picked s
     }
       
     if(mysqli_query($db,$sql)) {
-      echo "Score Entered";
+      echo "Score of $this_score Entered";
     } else {
       echo mysqli_error($db); 
     } 
   }
   
 
-} else {
-  $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points) VALUES (NULL,'$this_group_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner','$this_score',NULL)";
+} else { //first pick so add it to db and create point holder for week
+  $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points,reconciled) VALUES (NULL,'$this_group_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner','$this_score',NULL,NULL)";
   if(mysqli_query($db, $sql)) {
-    echo "Picke entered";
+    echo "Pick $this_winner entered";
   } else {
     echo mysqli_error($db);
   }
+  updatePoints($db,$this_user_id,$this_group_id,$this_season_year,$this_season_type,$this_week,false);
 }
 
 ?>

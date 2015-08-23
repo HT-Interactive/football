@@ -4,7 +4,9 @@
     	<div class="container">
       	<p class="text-muted">
         	<?php 
-        	echo 'Server Response: <span id="txtHint"></span><br />';
+        	echo 'Server Response: <span id="txtHint"></span>';
+            include("reconcile_picks.php");
+            echo '<br>';
         	if(isset($this_user_name)) { 
         	  if(!$my_points) { $my_points = 0; }
         		echo 'You have <b>'.$my_points.' points</b> this week. <a href="'.$SITE_ROOT.'index.php?season_year='.$current_season_year.'&season_type='.$current_season_type.'&week='.$current_week.'" class="navbar-link">Show picks for the Current Week</a>.';

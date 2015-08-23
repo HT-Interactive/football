@@ -3,6 +3,16 @@
 //DB Reconciliation Functions
 //***---------------------------
 
+function getUserIdFromName($db,$user_name) {
+    $sql = "SELECT user_id FROM users WHERE user_name='$user_name'";
+    $result = mysqli_query($db, $sql) or die(mysqli_error_list($db));
+    return $row = mysqli_fetch_array($result)['user_id'];
+}
+function getUserNameFromId($db,$user_id) {
+    $sql = "SELECT user_name FROM users WHERE user_id='$user_id'";
+    $result = mysqli_query($db, $sql) or die(mysqli_error_list($db));
+    return $row = mysqli_fetch_array($result)['user_name'];
+}
 function guessCurrentWeek() {
   global $current_season_year, $current_season_type, $current_week, $this_season_year, $this_season_type, $this_week, $this_group_id, $this_user_id, $this_default_group;
 // Guess Current Week
@@ -99,6 +109,23 @@ function reconcilePoints($db,$user_id,$group_id,$season_year,$season_type,$week,
  
 }
 
+function reconcileWinners($db,$winner,$group_id,$season_year,$season_type,$week,$verbose=FALSE) {
+    //New streamlined reconciliation process, added 8/22/15, this just sets the falgs in the db
+    $sql = "UPDATE points SET reconciled=1, winner=1 WHERE user_id='".getUserIdFromName($db,$winner)."' AND group_id='".$group_id."' AND season_year='".$season_year."' AND season_type='".$season_type."' AND week='".$week."'";
+    if(mysqli_query($db,$sql)) {
+        if($verbose) { echo "And has been reconciled in the database. $sql<br>\n"; }    
+    } else {
+        echo mysqli_error($db); 
+    } 
+    //Set all users for that week as reconciled also, just with NULL winner
+    $sql = "UPDATE points SET reconciled=1 WHERE group_id='".$group_id."' AND season_year='".$season_year."' AND season_type='".$season_type."' AND week='".$week."'";
+    if(mysqli_query($db,$sql)) {
+        if($verbose) { echo "The other loser have also been reconciled in the database. $sql<br>\n"; }    
+    } else {
+        echo mysqli_error($db); 
+    } 
+    
+}
 function reconcileWeeklyPoints($db,$group_id,$season_year,$season_type,$week) {
     // get users from mysql db that belong to the group
     $users = getUsers($db, $group_id);
