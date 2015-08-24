@@ -131,6 +131,7 @@ body {
   margin-bottom: 4px;
   background-color: #eee;
   color: DarkGray;
+  cursor: pointer;
   /* padding: 4px; */
 }
 .glyphCell {

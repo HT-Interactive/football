@@ -1,6 +1,6 @@
 function resetPassword() {
     document.getElementById('hiddenField').name = "forgot";
-    document.getElementById('hiddenField').value = "pass";
+    document.getElementById('hiddenField').value = "password";
 	document.getElementById('form-signin').submit();
 }
 

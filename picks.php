@@ -57,9 +57,9 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   }
 
   if(!isset($last_day_of_week) || $this_day_of_week != $last_day_of_week) { //print date row
-    echo "<tr>\n<td colspan=\"6\">";
+    echo "<tr>\n<td colspan=\"6\"><4>";
     echo date('l, F j Y',strtotime($this_start_time));
-    echo "</td>\n</tr>\n";
+    echo "</h4></td>\n</tr>\n";
   }
 
   $last_day_of_week = $this_day_of_week; //set last day to this day for next iteration

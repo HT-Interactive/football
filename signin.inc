@@ -5,7 +5,7 @@
   <div class="input-group">
   	<label for="inputPassword" class="sr-only">Password</label>
   	<input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
-    <span class="input-group-addon btn-forgot" id="basic-addon1" onclick="resetPassword()"><small>Forgot?</small></span>
+    <span class="input-group-addon btn-forgot" id="basic-addon1" onclick="resetPassword()" data-toggle="tooltip" data-placement="bottom" title="Click to reset your password."><small>Forgot?</small></span>
   </div>
   <input type="hidden" id="hiddenField" name="" value="">
   <button class="btn btn-lg btn-primary btn-block" type="submit" id="loginButton" name="login" value="Login">Sign in</button>
