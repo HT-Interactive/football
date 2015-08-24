@@ -64,8 +64,8 @@
       	} else {
           // add user to db
           $this_user_level = 0;
-          $user_email = mysql_real_escape_string($user_email);
-          $user_name = mysql_real_escape_string($user_name);
+          //$user_email = mysql_real_escape_string($user_email);
+          //$user_name = mysql_real_escape_string($user_name);
           $sql = "INSERT INTO users (user_id, user_email, user_name, user_pass, user_date, user_level,default_group) VALUES (NULL,'$user_email','$user_name','$crypt_password',NOW(),$this_user_level,$group)";
           //echo $sql;
           //exit;
@@ -90,6 +90,7 @@
            //we also put the user_id and user_name values in the $_SESSION, so we can use it at various pages
             $_SESSION['user_id']    = $this_user_id;
             $_SESSION['user_name']  = $user_name;
+            $_SESSION['user_email']  = $user_email;
             $_SESSION['user_level'] = $this_user_level;   
                          
           // Save authenticated name-pass in cookie
