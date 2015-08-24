@@ -54,10 +54,10 @@ else
 		
 		{				
 			echo "<tr>";
-				echo "<td class='leftpart'>";
+				echo "<td>";
 					echo "<h3><a href='category.php?id=$row[cat_id]'>" . $row["cat_name"] . "</a></h3>" . $row["cat_description"];
 				echo "</td>";
-				echo "<td class='rightpart'>";
+				echo "<td>";
 							
 			$topicsql = "SELECT
 									topic_id,
