@@ -120,15 +120,25 @@ body {
 }
 .form-signin {
   max-width: 330px;
-  padding: 15px;
-  margin: 0 auto; 
+  /*padding: 15px;*/
+  margin: 0 auto;
 }
 .form-signin .form-control {
-  margin-bottom: 4px;
+  /*margin:  4px auto; */
+  /* height:  46px; */
+}
+.form-control.email {
+    margin-bottom:  4px;
+}
+.form-control.password {
+    border-radius: 3px 3px 3px 3px;
+}
+.btn.login {
+    margin-top: 4px;
 }
 .btn-forgot {
   /* font-size: 8px; */
-  margin-bottom: 4px;
+  /* margin-bottom: 4px; */
   background-color: #eee;
   color: DarkGray;
   cursor: pointer;
