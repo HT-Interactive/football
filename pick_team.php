@@ -1,6 +1,7 @@
 <?php // Pick Team Script
 
 include("mysql.php");
+include_once("functions.php");
 
 // Date: 8-15-2015
 $this_user_id = $_REQUEST['user_id'];

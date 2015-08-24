@@ -74,8 +74,8 @@
           // get the new user id
           	$this_user_id = mysqli_insert_id($db);
 					//add user to group
-          	$sql = "INSERT INTO g_members (g_member_id, group_id, user_id) VALUES (NULL,'$group','$this_user_name')";
-						mysqli_query($db, $sql);
+          	$sql = "INSERT INTO g_members (g_member_id, group_id, user_id) VALUES (NULL,'$group','$this_user_id')";
+			mysqli_query($db, $sql);
 						
           // Set session id to unique value to prevent piggy-backing
           	$id = uniqid("");
