@@ -142,7 +142,7 @@ function resetPasswordLink($user,$sid) {
     header("Location: http://".$goTo);
     exit;
 
-  } elseif(isset($_REQUEST['forgot']) && $_REQUEST['forgot'] == 'pass') {
+  } elseif(isset($_REQUEST['forgot']) && $_REQUEST['forgot'] == 'password') {
     
     if(isset($_REQUEST['user_email']) && $_REQUEST['user_email'] != '') {    
     	if(isset($_REQUEST['code'])) {
