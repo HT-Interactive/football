@@ -57,7 +57,7 @@
     		$result = mysqli_query($db, $sql);
     		if(mysqli_num_rows($result) > 0) { // user already registered so redirect back to login with message
     			$user = mysqli_fetch_array($result);
-      		$message = urlencode('User name '.$user_name.' is already registered to '.$user['user_email'].' Please sign in below.');
+      		    $message = urlencode('User name '.$user_name.' is already registered to '.$user['user_email'].' Please sign in below.');
     			$goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']).'/index.php?action=login&user_email='.$user['user_email'].'&message='.$message;
       		header("Location: http://".$goTo);
       		exit;
