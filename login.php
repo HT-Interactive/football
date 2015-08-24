@@ -10,7 +10,7 @@
 
 // Get DB connect info
   require("mysql.php");
-  include 'common.php';
+  include("common.php");
 
 function resetPasswordLink($user,$sid) {
 	global $SITE_HOST, $BASE_DIR;

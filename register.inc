@@ -11,7 +11,7 @@
   <label for="selectGroup">Select a Group to Join</label> 
   <select id="selectGroup" class="form-control" name="group">
   <?php
-  	foreach(getGroups($db) as $group) {
+  	foreach(getPublicGroups($db) as $group) {
   		echo '<option value="'.$group['group_id'],'">'.$group['group_name'].'</option>';
   	}
   ?>

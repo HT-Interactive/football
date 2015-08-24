@@ -102,6 +102,3 @@ else
 
 include 'footer.php';
 ?>
-
-</div>
-</div>

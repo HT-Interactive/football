@@ -17,8 +17,8 @@
           <?php
 
   					if(isset($this_user_name)) {
-            	echo '<li '.(($SITE_PAGE == 'picks') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'index.php?action=picks">My Picks</a></li>';
-            	echo '<li '.(($SITE_PAGE == 'standings') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'index.php?action=standings">Standings</a></li>';
+            	echo '<li '.(($SITE_PAGE == 'picks') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'picks.php">My Picks</a></li>';
+            	echo '<li '.(($SITE_PAGE == 'standings') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'standings.php">Standings</a></li>';
             	echo '<li '.(($SITE_PAGE == 'forum') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'forum.php">Forum</a></li>';
             	echo '<li><a href="#"><img width="20" alt="Former Clemson Player Stats" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Clemson_University_Tiger_Paw_logo.svg/32px-Clemson_University_Tiger_Paw_logo.svg.png"/> Stats</a></li>';
             }
@@ -35,7 +35,6 @@
     echo "</form>";
     echo "<p class=\"navbar-text navbar-right\">Signed in as <a href=\"#\" class=\"navbar-link\">$this_user_name</a></p>";
 
-
   } else {
 
     //echo "<form class=\"navbar-form navbar-right\" role=\"signin\" action=\"index.php\">";
@@ -43,7 +42,7 @@
     //echo "</form>";
 
   }
-  echo '<p class="navbar-text navbar-right">SID '.session_id().'</p>';
+  //echo '<p class="navbar-text navbar-right">SID '.session_id().'</p>';
 
 ?>
         </div><!--/.nav-collapse -->

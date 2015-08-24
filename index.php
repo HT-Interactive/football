@@ -14,33 +14,33 @@ include("functions.php"); //Site Functions
 //try to guess the current week, function in get_winners
 guessCurrentWeek();
 
-include 'header.php';
-guessCurrentWeek();
-			if(isset($this_user_name)) {
-        if(isset($this_action)) {
-        	switch($this_action) {
-        		case('picks'):
-        			include 'current_schedule_grouped.php';
-  						break;
-  					case('standings'):
-  						include 'current_standings.php';
-  						break;
-  					case('reset_password'):
-  						include 'password.inc';
-  						break;
-  					default:
-  						include 'current_schedule_grouped.php';
-  						break;
-  				}
-        } else {
-        	include 'current_schedule_grouped.php';
-        }
-      } elseif(isset($_REQUEST['register'])) {
-				include("register.inc");
-			} else {
-				include("signin.inc");
-      }
 
-include 'footer.php';
+
+//guessCurrentWeek();
+
+if(isset($this_user_name)) {
+    if(isset($this_action)) {
+        include("header.php");
+        switch($this_action) {
+  		    case('reset_password'):
+  			    include("password.inc");
+  			    break;
+  	    }
+    } else {
+      //redirect to picks  
+      //$error=urlencode("Passwords do not match.");
+      $goTo = $_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/picks.php";
+      header("Location: http://".$goTo);
+      exit;    
+    }
+} elseif(isset($_REQUEST['register'])) {
+    include("header.php");
+	include("register.inc");
+} else {
+    include("header.php");
+	include("signin.inc");
+}
+
+include("footer.php");
 
 ?>

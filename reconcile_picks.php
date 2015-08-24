@@ -47,10 +47,10 @@ while($user_pick = mysqli_fetch_array($pick_result)) {
 
         if($winning_team == $user_winner) {
             //pick correct
-            addPoint($db,$user_pick_id,1,TRUE);
+            addPoint($db,$user_pick_id,1,FALSE);
         } else { 
             //($winning_team != $user_winner || $winning_team == 'tied') 
-            addPoint($db,$user_pick_id,0,TRUE);
+            addPoint($db,$user_pick_id,0,FALSE);
         }
 
         if($has_finished) {

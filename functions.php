@@ -316,7 +316,7 @@ function getWeeklyScore($db,$user_id,$group_id,$season_year,$season_type,$week) 
   if($row['score'] >= 0) {
     return [$row['game_id'],$row['score']];
   } else {
-    return [$row['game_id'],0];
+    return [$row['game_id'],NULL];
   }
 }
 
@@ -389,6 +389,15 @@ function getGroups($db,$user_id = 'all') {
             . "WHERE g_members.user_id='$user_id'";
         $result = mysqli_query($db, $sql);
     }
+    while($group = mysqli_fetch_array($result)) {
+        $groups[] = $group;
+    }
+	mysqli_free_result($result);
+    return $groups;
+}
+
+function getPublicGroups($db) {
+    $result = mysqli_query($db, "SELECT * FROM groups WHERE private IS NULL");
     while($group = mysqli_fetch_array($result)) {
         $groups[] = $group;
     }

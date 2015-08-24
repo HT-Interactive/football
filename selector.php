@@ -24,7 +24,7 @@ $current_time = date("l h:iA T", time());
             <?php
               $groups = getGroups($db,$this_user_id);
               foreach($groups as $group) {
-                echo '<li><a href="index.php?group_id='.$group['group_id'].'&season_year='.$this_season_year.'&season_type='.$this_season_type.'&week='.$this_week.'">'.$group['group_name'].'</a></li>';
+                echo '<li><a href="'.$THIS_PAGE.'?group_id='.$group['group_id'].'&season_year='.$this_season_year.'&season_type='.$this_season_type.'&week='.$this_week.'">'.$group['group_name'].'</a></li>';
               }
             ?>      
           </ul>
@@ -37,7 +37,7 @@ $current_time = date("l h:iA T", time());
             <?php
               $season_years = getSeasonYears();
               foreach($season_years as $display_year) {
-                echo "<li><a href=\"index.php?season_year=$display_year&season_type=$this_season_type&week=$this_week\">$display_year</a></li>";
+                echo "<li><a href=\"".$THIS_PAGE."?season_year=$display_year&season_type=$this_season_type&week=$this_week\">$display_year</a></li>";
               }
             ?>      
           </ul>
@@ -49,7 +49,7 @@ $current_time = date("l h:iA T", time());
             <?php
               $season_types = getSeasonTypes();
               foreach($season_types as $display_type) {
-                echo "<li><a href=\"index.php?season_type=$display_type&season_year=$this_season_year&week=$this_week\">$display_type</a></li>";
+                echo "<li><a href=\"".$THIS_PAGE."?season_type=$display_type&season_year=$this_season_year&week=$this_week\">$display_type</a></li>";
               }
             ?>  
           </ul>
@@ -61,7 +61,7 @@ $current_time = date("l h:iA T", time());
             <?php
               $season_weeks = getWeeks($this_season_year,$this_season_type);
               foreach($season_weeks as $display_week) {
-                echo "<li><a href=\"index.php?season_type=$this_season_type&season_year=$this_season_year&week=$display_week\">$display_week</a></li>";
+                echo "<li><a href=\"".$THIS_PAGE."?season_type=$this_season_type&season_year=$this_season_year&week=$display_week\">$display_week</a></li>";
               }
             ?>  
           </ul>
