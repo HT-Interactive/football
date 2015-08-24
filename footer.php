@@ -3,6 +3,7 @@
    	<footer class="footer">
     	<div class="container">
       	<p class="text-muted">
+            <span id="server_status" class="glyphicon glyphicon-refresh" aria-hidden="true" style="color: green;" onclick="reconcileDB()"></span>
         	<?php 
         	echo 'Server Response: <span id="txtHint"></span>';
             include("reconcile_picks.php");

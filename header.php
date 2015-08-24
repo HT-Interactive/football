@@ -35,7 +35,7 @@
 
   </head>
 
-  <body>
+  <body onload="reconcileDB()">
 
     <?php include("navigator.php"); ?>
     <?php if(isset($this_user_name)) { include("selector.php"); } ?>
