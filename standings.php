@@ -273,11 +273,86 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
 //calculateWinnings($users,$weeks,$wins,$anty)
 } //--End Function
 
-  // get all users from mysql db
-  $users = getUsers($db,$this_group_id);
+    // get all users from mysql db
+    $users = getUsers($db,$this_group_id);
+    $last_week = $current_week - 1;
+    $weekly_results_title = "Current Week Results <small>($current_season_year $current_season_type Week $current_week)</small>";
+    $season_results_title = "$this_season_year Season Standings <small>(Through $current_season_year $current_season_type Week $last_week)</small>";
+    echo '
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    '
+                    .$weekly_results_title.
+                    '
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">';
+                    displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week);
+    echo '
+                </div>
+                <div class="panel-footer"></div>
+            </div>
+        </div>';
 
+    echo '
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" id="headingTwo">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    '
+                    .$season_results_title.
+                    '
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">';
+                    $these_types = getGroupSeasonTypes($db,$this_group_id,$this_season_year);
+                    displaySeasonStandings($db,$users,$this_season_year,$these_types,$current_week);
+    echo '
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-group unit-selector" role="group" aria-label="...">
+                        <button type="button" id="ButtonSeasonWins" class="btn btn-default btn-xs" onclick="showStandings(this,\'wins\')"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> Wins</button>
+                        <button type="button" id="ButtonSeasonDollars" class="btn btn-default btn-xs" style="background-color: #eee;" onclick="showStandings(this,\'dollars\')"><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> </button>
+                        <button type="button" id="ButtonSeasonWins" class="btn btn-default btn-xs" onclick="showDebugging(this)"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Debug</button>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+
+/*
+    echo '
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" id="headingTwo">
+      <div class="panel-heading">'.$this_season_year.' Season Standings
+    </div>';
+    echo '<div class="panel-body">';
+    $these_types = getGroupSeasonTypes($db,$this_group_id,$this_season_year);
+    displaySeasonStandings($db,$users,$this_season_year,$these_types,$current_week);
+    echo '
+    </div>
+      <div class="panel-footer">';
+      echo "<div class=\"btn-group unit-selector\" role=\"group\" aria-label=\"...\">
+            <button type=\"button\" id=\"ButtonSeasonWins\" class=\"btn btn-default btn-xs\" onclick=\"showStandings(this,'wins')\"><span class=\"glyphicon glyphicon-star\" aria-hidden=\"true\"></span> Wins</button>
+            <button type=\"button\" id=\"ButtonSeasonDollars\" class=\"btn btn-default btn-xs\" style=\"background-color: #eee;\" onclick=\"showStandings(this,'dollars')\"><span class=\"glyphicon glyphicon-usd\" aria-hidden=\"true\"></span> </button>
+            <button type=\"button\" id=\"ButtonSeasonWins\" class=\"btn btn-default btn-xs\" onclick=\"showDebugging(this)\"><span class=\"glyphicon glyphicon-warning-sign\" aria-hidden=\"true\"></span> Debug</button>
+          </div>
+      </div>";
+    echo '</div>';
+*/
+  /*
   echo "<h2>Current Week Standings for ".getGroupName($db,$this_group_id)." <small>($current_season_year $current_season_type $current_week)</small></h2>";
   displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week);
+
 
   echo "<h2>Current Season Standings for ".getGroupName($db,$this_group_id)." <small>($this_season_year)</small>";
   echo "<div class=\"btn-group\" role=\"group\" aria-label=\"...\">
@@ -288,7 +363,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   $these_types[] = getGroupSeasonTypes($db,$this_group_id,$this_season_year);
   //print_r($these_types);
   displaySeasonStandings($db,$users,$this_season_year,$these_types,$current_week);
-  
+  */
   //print_r($season_types);
    
   //foreach($users as $user) {
@@ -301,22 +376,40 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   //  echo $user['user_name'].getSeasonPoints($db,$user['user_id'],$this_season_year)."<br>";
   //}
   
-  echo "<h2>Results By Week</h2>";
-  $season_types = getSeasonTypes(); 
+  echo "<h3>Results By Week</h3>\n";
+ 
+
+  $season_types = getGroupSeasonTypes($db,$this_group_id,$this_season_year); 
+
   foreach($season_types as $display_type) {
 
-    echo "<h3>$display_type <small>($this_season_year)</small></h3>";
+    echo "<h4>$display_type <small>($this_season_year)</small></h4>\n";
 
     $season_weeks = getWeeks($this_season_year,$display_type);
-
+    $i=1;
     foreach($season_weeks as $display_week) {
       if($display_week < $current_week) {
         //$wins[] = getWeeklyWinner($db,$this_season_year,$display_type,$display_week);
-      	echo "<h4>Week $display_week <small>($display_type $this_season_year)</small></h4>";
-      	displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
-      }
-    }
+        echo '
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingWeek'.$display_week.'">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWeek'.$display_week.'" aria-expanded="true" aria-controls="collapseWeek'.$display_week.'">Week '.$display_week.' <small>('.$display_type.' '.$this_season_year.')</small></a>
+                </h4>
+            </div>
+            <div id="collapseWeek'.$display_week.'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">';
+                displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
+        echo '
+                </div>
+                <div class="panel-footer"></div>
+            </div>
+        </div>';
 
+      }
+      $i++;
+    }
+    echo '</div>';
   }
 
 //--Main Footer

@@ -409,7 +409,7 @@ function getGroupSeasonTypes($db,$group_id,$season_year) {
     $sql = "SELECT season_type FROM g_seasons WHERE group_id = '$group_id' AND season_year = '$season_year'";
     $result = mysqli_query($db,$sql);
     while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)) {
-        $these_season_types = $row['season_type'];
+        $these_season_types[] = $row['season_type'];
     }
 	mysqli_free_result($result);
     return $these_season_types;
