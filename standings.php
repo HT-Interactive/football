@@ -60,14 +60,14 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   arsort($totals);
   $i=0;
   foreach($totals as $u => $n) {
-    echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">";
-    echo "<div class=\"progress-bar";
+    echo "\n<div class=\"progress-label\">".$u."</div><div class=\"progress\">\n";
+    echo "\t<div class=\"progress-bar";
     if($i==0 && $n > 0) { echo " progress-bar-success"; }
     $length = ($n/$num_games)*100;
-    echo "\" role=\"progressbar\" aria-valuenow=\"$length\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $length%;\">
-    $n ($n/$num_games, $length%)
-    </div>
-    </div>";
+    echo "\" role=\"progressbar\" aria-valuenow=\"$length\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $length%;\">\n
+    $n ($n/$num_games, $length%)\n
+    </div>\n
+    </div>\n";
     $i++;
   }
 
@@ -76,7 +76,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
 function displaySeasonStandings($db,$users,$season_year,$season_types,$current_week) {
     global $this_group_id;
   // create an invisible DIV to hold debugging info
-  echo "<div id=\"DivSeasonDebugging\" style=\"display: none;\">";
+  echo "<div id=\"DivSeasonDebugging\" style=\"display: none;\">\n";
 
   //$season_types = getSeasonTypes(); //get all types
   $season_wins = array(); //initialize win placeholder
@@ -91,7 +91,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
    if(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
         //just build the $season_wins[$user_name] array from the previous DB Result
         $is_reconciled = TRUE;
-        echo '<h2>DB is Reconciled so using those results.</h2>';
+        echo '<h2>DB is Reconciled so using those results.</h2>\n';
         print_r($row);
         do { //add winnders
             $this_key = getUserNameFromId($db,$row['user_id']);
@@ -107,7 +107,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         }
         echo "<p>Season Wins:";
         print_r($season_wins);
-   
+        echo "</p>\n";
    } else {
      $is_reconciled = FALSE;
   
@@ -121,9 +121,13 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         $season_weeks = getWeeks($season_year,$season_type);
         echo "<p>Weeks this season:";
         print_r($season_weeks);
+        echo "</p>\n";
         echo "<p>Current week is: $current_week";
         $total_weeks += count($season_weeks);
+        echo "</p>\n";
         echo "<p>Week Count.: $total_weeks";
+        echo "</p>\n";
+
         foreach($season_weeks as $week) {
       
           if($week < $current_week) { //only count completed weeks
@@ -140,37 +144,37 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
                 $scores[$this_key] = $score[1];
                 echo "<p>User ".$this_key." has ".$totals[$this_key]." and a guess of score ".$scores[$this_key]." for game ".$this_game_id;
                 //print_r($score);
-                echo "</p>";
+                echo "</p>\n";
                 $percentage = ($num_correct / $num_games) * 100;
             }  
         
-            echo "<br>Scores array<br>";
+            echo "\n<br>Scores array<br>\n";
             print_r($scores);
-            echo "<br>Unsorted Totals array:<br>";
+            echo "<br>Unsorted Totals array:<br>\n";
             print_r($totals);
 
             arsort($totals);
 
             $top_score = max($totals);
-            echo "<br>Sorted Totals array:<br>";
+            echo "\n<br>Sorted Totals array:<br>\n";
             print_r($totals);
-            echo "<br>with a Top Score of $top_score<br>";
+            echo "\n<br>with a Top Score of $top_score<br>\n";
 
             if(count($totals) <= 1 ) {
 
             } elseif(current($totals) == next($totals)) { //there is a tie
                 reset($totals);
-                echo "<p>It's a tie!</p>";
+                echo "<p>It's a tie!</p>\n";
                 do { //remove the low scores
                     if(current($totals) != $top_score) {
                         array_pop($totals);
                     }
                 } while(next($totals));
 
-                echo "<br>Possible winners after culling:<br>";
+                echo "<br>Possible winners after culling:<br>\n";
                 print_r($totals);
   
-                echo "<br>Score Array:<br>";
+                echo "<br>Score Array:<br>\n";
                 print_r($scores);
 
                 if(isset($this_game_id)) {
@@ -178,33 +182,33 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
                 } else {
                     $game_score = 0;
                 }
-                echo "<br>Subtract Actual Game score of $game_score.<br>";
+                echo "<br>Subtract Actual Game score of $game_score.<br>\n";
           
                 foreach($scores as $u => $s) {
                     $score_diffs[$u] = abs($s - $game_score);
                 }
          
-                echo "<br>Unsorted Score Differentials:<br>";
+                echo "<br>Unsorted Score Differentials:<br>\n";
                 print_r($score_diffs);
                 asort($score_diffs);
-                echo "<br>Sorted Score Differentials:<br>";
+                echo "<br>Sorted Score Differentials:<br>\n";
                 print_r($score_diffs);
                 $lowest_diff = max($score_diffs);
-                echo "<br>with a Lowest Diff of $lowest_diff<br>";
+                echo "<br>with a Lowest Diff of $lowest_diff<br>\n";
 
                 if(current($score_diffs) == next($score_diffs)) { //there is a another tie
                     $winner = key($score_diffs); //flip a proverbial coin
-                    echo $winner." has won the second tie breaker through a random selection process.<br>";
+                    echo $winner." has won the second tie breaker through a random selection process.<br>\n";
                     reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
                     $season_wins[$winner] += 1;
-                    echo "<p>".print_r($season_wins)."</p>";
+                    echo "<p>".print_r($season_wins)."</p>\n";
                 } else {
                     reset($score_diffs);
                     $winner = key($score_diffs);
-                    echo $winner." has won the tie breaker with a score differential of $lowest_diff.<br>";
+                    echo $winner." has won the tie breaker with a score differential of $lowest_diff.<br>\n";
                     reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
                     $season_wins[$winner] += 1;
-                    echo "<p>".print_r($season_wins)."</p>";
+                    echo "<p>".print_r($season_wins)."</p>\n";
                 }
             } else {
                 reset($totals);
@@ -213,35 +217,35 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
                 //Reconcile weekly point total and flag winner in DB
                 reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
                 $season_wins[$winner] += 1;
-                echo "<p>".print_r($season_wins)."</p>";
+                echo "<p>".print_r($season_wins)."</p>\n";
             }//End Tie Determination
           }//--End IF current week check
         }//--Week
       }//End foreach Season
    }//END reconciliation check
    
-    echo "</div>"; //end debug
+    echo "</div>\n"; //end debug
 
 //Display winner graph
     //print_r($season_wins);
     //echo "<div style=\"border: 1px solid green;\">";
-    echo "<div id=\"DivSeasonWins\">";
+    echo "<div id=\"DivSeasonWins\">\n";
     arsort($season_wins);
     $i=0;
     foreach($season_wins as $u => $w) {
         $p = ($w / $total_weeks ) * 100;
-        echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">";
-        echo "<div class=\"progress-bar";
+        echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">\n";
+        echo "\t<div class=\"progress-bar";
         if($i==0 && $p > 0) { echo " progress-bar-success"; }
-        echo "\" role=\"progressbar\" aria-valuenow=\"$p\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $p%\">
-        $w ($w/$total_weeks, $p%)
-        </div>
-        </div>";
+        echo "\" role=\"progressbar\" aria-valuenow=\"$p\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $p%\">\n
+        $w ($w/$total_weeks, $p%)\n
+        </div>\n
+        </div>\n";
         $i++;
     }
-    echo "</div>";
+    echo "</div>\n";
 
-    echo "<div id=\"DivSeasonDollars\" style=\"position: absolute; visibility: hidden;\">";
+    echo "<div id=\"DivSeasonDollars\" style=\"position: absolute; visibility: hidden;\">\n";
     // each user bar should go from -34 to max
     //$i=0;
     $anty = 2;
@@ -257,17 +261,17 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
     $current_balance = $starting_balance + $winnings;
     $winnings_p = ($winnings / $max_winnings ) * 100;
     $break_even_p = ($starting_anty / $max_winnings ) * 100; 
-    echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">";
+    echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">\n";
     if($winnings_p > $break_even_p) { 
-        echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $break_even_p%\"></div>";
+        echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $break_even_p%\"></div>\n";
         $whats_left = $winnings_p - $break_even_p;
-        echo "<div class=\"progress-bar progress-bar-success\" role=\"progressbar\" style=\"min-width: 2em; width: $whats_left%\">&#36;$current_balance</div>";
+        echo "<div class=\"progress-bar progress-bar-success\" role=\"progressbar\" style=\"min-width: 2em; width: $whats_left%\">&#36;$current_balance</div>\n";
     } else {
-        echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $winnings_p%\">&#36;$current_balance</div>";
+        echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $winnings_p%\">&#36;$current_balance</div>\n";
     }
-    echo "</div>";
+    echo "</div>\n";
     }
-    echo "</div>";
+    echo "</div>\n";
     //echo "</div>";
     
 //calculateWinnings($users,$weeks,$wins,$anty)
@@ -278,12 +282,14 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
     $last_week = $current_week - 1;
     $weekly_results_title = "Current Week Results <small>($current_season_year $current_season_type Week $current_week)</small>";
     $season_results_title = "$this_season_year Season Standings <small>(Through $current_season_year $current_season_type Week $last_week)</small>";
-    echo '
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    // Accordion style
+    //echo '
+    //<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      echo '
         <div class="panel panel-default">
             <div class="panel-heading" id="headingOne">
                 <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <a role="button" data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                     '
                     .$weekly_results_title.
                     '
@@ -297,14 +303,13 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
                 </div>
                 <div class="panel-footer"></div>
             </div>
-        </div>';
+        </div><!--Panel -->';
 
     echo '
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         <div class="panel panel-default">
             <div class="panel-heading" id="headingTwo">
                 <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <a role="button" data-toggle="collapse" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                     '
                     .$season_results_title.
                     '
@@ -325,7 +330,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
                     </div>
                 </div>
             </div>
-        </div>';
+        </div><!--Panel -->';
 
 
 /*
@@ -376,8 +381,9 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   //  echo $user['user_name'].getSeasonPoints($db,$user['user_id'],$this_season_year)."<br>";
   //}
   
-  echo "<h3>Results By Week</h3>\n";
- 
+  echo "\n<h3>Results By Week</h3>\n";
+  echo '
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
 
   $season_types = getGroupSeasonTypes($db,$this_group_id,$this_season_year); 
 
@@ -399,17 +405,18 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
             </div>
             <div id="collapseWeek'.$display_week.'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">';
-                displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
+                    displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
         echo '
                 </div>
                 <div class="panel-footer"></div>
             </div>
-        </div>';
+        </div><!--Panel -->';
 
       }
       $i++;
     }
-    echo '</div>';
+    echo '
+    </div><!--Panel Group -->';
   }
 
 //--Main Footer

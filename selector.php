@@ -12,7 +12,6 @@ $current_time = date("l h:iA T", time());
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
       </button>
-      
     </div><!--/.navbar-header -->
     <p class="weekSelector-text">Your Picks for <?php echo "$this_season_year $this_season_type Week $this_week"; ?></p>
     <div id="navbar2" class="navbar-collapse collapse weekSelector">
@@ -29,7 +28,6 @@ $current_time = date("l h:iA T", time());
             ?>      
           </ul>
         </li>
-      <ul class="nav navbar-nav weekSelector">
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?php echo $this_season_year; ?> <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -54,7 +52,7 @@ $current_time = date("l h:iA T", time());
             ?>  
           </ul>
         </li>
-       <li class="dropdown">
+        <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Week <?php echo $this_week; ?> <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li class="dropdown-header">Season Weeks</li>
