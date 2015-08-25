@@ -293,6 +293,19 @@ function getMondayNightKickoff($season_year,$season_type,$week) {
   $game = pg_fetch_array($result, null, PGSQL_ASSOC);
   return $game['start_time'];  
 }
+function getMondayNightGame($season_year,$season_type,$week) {
+   // Performing SQL query
+  echo "check the score of game on Monday $season_year $season_type Week $week. ";
+  $query = "SELECT gsis_id FROM game WHERE day_of_week='Monday' AND season_year='$season_year' AND season_type='$season_type' AND week='$week' ORDER BY start_time DESC";
+  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+  if(pg_num_rows($result)==0) {// just get last game
+    $query = "SELECT gsis_id FROM game WHERE season_year='$season_year' AND season_type='$season_type' AND week='$week' ORDER BY start_time DESC";  
+    $result = pg_query($query) or die('Query failed: ' . pg_last_error());  
+  }
+  $game = pg_fetch_array($result, null, PGSQL_ASSOC);
+  echo $game['gsis_id'];
+  return $game['gsis_id'];  
+}
 function getFirstKickoffOfWeek($season_year,$season_type,$week) {
    // Performing SQL query
   $query = "SELECT start_time FROM game WHERE season_year='$season_year' AND season_type='$season_type' AND week='$week' ORDER BY start_time ASC";
@@ -303,11 +316,10 @@ function getFirstKickoffOfWeek($season_year,$season_type,$week) {
 function allGamesFinished($season_year,$season_type,$week) {
   $query = "SELECT * FROM game WHERE finished='f' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'";
   $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-  $game = pg_fetch_array($result, null, PGSQL_ASSOC);
-  if(empty($result)) {
-      return TRUE;
+  if(pg_num_rows($result) > 0) {
+      return FALSE;
   } else {
-      return FALSE;   
+      return TRUE;   
   }
    
 }

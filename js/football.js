@@ -124,7 +124,7 @@ function reconcileDB() { //dom_element,user,group,game_id,year,type,week,winner
             //change glyph to something to indicate success
         }
     }
-    xmlhttp.open("GET", "reconcile_picks.php");
+    xmlhttp.open("GET", "reconcile_db.php");
     xmlhttp.send();
  
 }

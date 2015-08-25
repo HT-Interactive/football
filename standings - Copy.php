@@ -118,9 +118,21 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   $result = mysqli_query($db,$sql);
   $row_cnt = mysqli_num_rows($result);
   $row = mysqli_fetch_array($result,MYSQL_ASSOC);
-
-  //  if(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
-  if(mysqli_num_rows($result) > 0) {
+   /*if($row_cnt == 0) { //nothing in DB so just set everyone to zero
+        echo '<h2>DB is Empty.</h2>\n';
+        print_r($row);
+        foreach($users as $user) {
+            $this_key = getUserNameFromId($db,$user['user_id']);
+            if(!array_key_exists($this_key,$season_wins)) {
+                $season_wins[$this_key] = 0;
+            }
+        }
+        echo "<p>Season Wins:";
+        print_r($season_wins);
+        echo "</p>\n";
+      
+   } else*/
+    if(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
         //just build the $season_wins[$user_name] array from the previous DB Result
         $is_reconciled = TRUE;
         echo '<h2>DB is Reconciled so using those results.</h2>';
@@ -141,22 +153,14 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         print_r($season_wins);
         echo "</p>\n";
    } else {//try to reconcile if all games are complete for the week
-        echo "Empty result";
-        foreach($users as $user) {
-            $this_key = getUserNameFromId($db,$user['user_id']);
-            if(!array_key_exists($this_key,$season_wins)) {
-                $season_wins[$this_key] = 0;
-            }
-        }
-   
-      /*
+      
         $is_reconciled = FALSE;
-        
+        /*
         echo '<h2>Find Winners and Reconcile DB</h2>';
         foreach($users as $user) { //set each user to 0 wins
             $season_wins[$user['user_name']] = 0;
         }
-       
+        */
         foreach($season_types as $season_type) {
 
         $season_weeks = getWeeks($season_year,$season_type);
@@ -282,8 +286,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
                  }//--End IF current week check
             } //reconcile
         }//--Week
-      }//End foreach Season 
-     */ 
+      }//End foreach Season  
    }//END reconciliation check
    
     echo "</div>\n"; //end debug
