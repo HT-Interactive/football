@@ -47,7 +47,7 @@ body {
 .teamCell:hover,
 .teamCell.picked:hover,
 .teamCell.notPicked:hover {
-  background-color: #e7e7e7;
+  background-color: LightGray;
 }
 /*.teamCell.away:hover {
   background-color: #e7e7e7;
