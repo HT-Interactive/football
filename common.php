@@ -42,6 +42,12 @@ switch($THIS_PAGE) {
 	case('forum.php'):
 		$SITE_PAGE = 'forum';
 		break;
+    case('standings.php'):
+		$SITE_PAGE = 'standings';
+		break;
+    case('picks.php'):
+		$SITE_PAGE = 'picks';
+		break;
 	default:
 		$SITE_PAGE = 'picks';
 		break;

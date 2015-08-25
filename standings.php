@@ -76,6 +76,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   foreach($totals as $u => $n) {
 
       $length = ($n/$num_games)*100;
+      $length = round($length);
       $total_str = "$n ($n/$num_games, $length%)";
     echo '
     <tr>';
@@ -117,7 +118,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   $result = mysqli_query($db,$sql);
   $row_cnt = mysqli_num_rows($result);
   $row = mysqli_fetch_array($result,MYSQL_ASSOC);
-   if($row_cnt == 0) { //nothing in DB so just set everyone to zero
+   /*if($row_cnt == 0) { //nothing in DB so just set everyone to zero
         echo '<h2>DB is Empty.</h2>\n';
         print_r($row);
         foreach($users as $user) {
@@ -130,7 +131,8 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         print_r($season_wins);
         echo "</p>\n";
       
-   } elseif(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
+   } else*/
+    if(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
         //just build the $season_wins[$user_name] array from the previous DB Result
         $is_reconciled = TRUE;
         echo '<h2>DB is Reconciled so using those results.</h2>';
@@ -150,15 +152,16 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         echo "<p>Season Wins:";
         print_r($season_wins);
         echo "</p>\n";
-   } else {
-      $is_reconciled = FALSE;
-      echo '<h2>Find Winners and Reconcile DB</h2>';
-      foreach($users as $user) { //set each user to 0 wins
-        $season_wins[$user['user_name']] = 0;
-      }
-      //print_r($season_wins);
-
-      foreach($season_types as $season_type) {
+   } else {//try to reconcile if all games are complete for the week
+      
+        $is_reconciled = FALSE;
+        /*
+        echo '<h2>Find Winners and Reconcile DB</h2>';
+        foreach($users as $user) { //set each user to 0 wins
+            $season_wins[$user['user_name']] = 0;
+        }
+        */
+        foreach($season_types as $season_type) {
 
         $season_weeks = getWeeks($season_year,$season_type);
         echo "<p>Weeks this season:";
@@ -171,99 +174,119 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         echo "</p>\n";
 
         foreach($season_weeks as $week) {
-      
-          if($week < $current_week) { //only count completed weeks
-            $num_games = getNumberOfGames($season_year,$season_type,$week);
-            $totals = array();
-            $scores = array();
- 
-            foreach($users as $user) {    
-                $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
-                $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week); //returns array with gsis_id and total score
-                $this_key = $user['user_name'];
-                $this_game_id = $score[0];
-                $totals[$this_key] = $num_correct; 
-                $scores[$this_key] = $score[1];
-                echo "<p>User ".$this_key." has ".$totals[$this_key]." and a guess of score ".$scores[$this_key]." for game ".$this_game_id;
-                //print_r($score);
-                echo "</p>\n";
-                $percentage = ($num_correct / $num_games) * 100;
-            }  
-        
-            echo "\n<br>Scores array<br>\n";
-            print_r($scores);
-            echo "<br>Unsorted Totals array:<br>\n";
-            print_r($totals);
-
-            arsort($totals);
-
-            $top_score = max($totals);
-            echo "\n<br>Sorted Totals array:<br>\n";
-            print_r($totals);
-            echo "\n<br>with a Top Score of $top_score<br>\n";
-
-            if(count($totals) <= 1 ) {
-
-            } elseif(current($totals) == next($totals)) { //there is a tie
-                reset($totals);
-                echo "<p>It's a tie!</p>\n";
-                do { //remove the low scores
-                    if(current($totals) != $top_score) {
-                        array_pop($totals);
+            if(!allGamesFinished($season_year,$season_type,$week)) { //skip reconcil
+                echo '<h2>Week Not Over</h2>\n';
+                print_r($row);
+                foreach($users as $user) {
+                    $this_key = getUserNameFromId($db,$user['user_id']);
+                    if(!array_key_exists($this_key,$season_wins)) {
+                        $season_wins[$this_key] = 0;
                     }
-                } while(next($totals));
-
-                echo "<br>Possible winners after culling:<br>\n";
-                print_r($totals);
-  
-                echo "<br>Score Array:<br>\n";
-                print_r($scores);
-
-                if(isset($this_game_id)) {
-                    $game_score = getGameScore($this_game_id);
-                } else {
-                    $game_score = 0;
                 }
-                echo "<br>Subtract Actual Game score of $game_score.<br>\n";
+                break;
+            } else { //try to reconcile
+                echo '<h2>Find Winners and Reconcile DB</h2>';
+                foreach($users as $user) { //set each user to 0 wins
+                    $season_wins[$user['user_name']] = 0;
+                }
+                echo "<p>Season Wins:";
+                print_r($season_wins);
+                echo "</p>\n";
           
-                foreach($scores as $u => $s) {
-                    $score_diffs[$u] = abs($s - $game_score);
-                }
-         
-                echo "<br>Unsorted Score Differentials:<br>\n";
-                print_r($score_diffs);
-                asort($score_diffs);
-                echo "<br>Sorted Score Differentials:<br>\n";
-                print_r($score_diffs);
-                $lowest_diff = max($score_diffs);
-                echo "<br>with a Lowest Diff of $lowest_diff<br>\n";
+                if($week < $current_week) { //only count completed weeks
+                    $num_games = getNumberOfGames($season_year,$season_type,$week);
+                    $totals = array();
+                    $scores = array();
+ 
+                    foreach($users as $user) {    
+                        $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
+                        $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week); //returns array with gsis_id and total score
+                        $this_key = $user['user_name'];
+                        $this_game_id = $score[0];
+                        $totals[$this_key] = $num_correct; 
+                        $scores[$this_key] = $score[1];
+                        echo "<p>User ".$this_key." has ".$totals[$this_key]." and a guess of score ".$scores[$this_key]." for game ".$this_game_id;
+                        //print_r($score);
+                        echo "</p>\n";
+                        $percentage = ($num_correct / $num_games) * 100;
+                    }  
+        
+                    echo "\n<br>Scores array<br>\n";
+                    print_r($scores);
+                    echo "<br>Unsorted Totals array:<br>\n";
+                    print_r($totals);
 
-                if(current($score_diffs) == next($score_diffs)) { //there is a another tie
-                    $winner = key($score_diffs); //flip a proverbial coin
-                    echo $winner." has won the second tie breaker through a random selection process.<br>\n";
-                    reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
-                    $season_wins[$winner] += 1;
-                    echo "<p>".print_r($season_wins)."</p>\n";
-                } else {
-                    reset($score_diffs);
-                    $winner = key($score_diffs);
-                    echo $winner." has won the tie breaker with a score differential of $lowest_diff.<br>\n";
-                    reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
-                    $season_wins[$winner] += 1;
-                    echo "<p>".print_r($season_wins)."</p>\n";
-                }
-            } else {
-                reset($totals);
-                $winner = key($totals);
-                echo $winner." has won on picks. ";
-                //Reconcile weekly point total and flag winner in DB
-                reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
-                $season_wins[$winner] += 1;
-                echo "<p>".print_r($season_wins)."</p>\n";
-            }//End Tie Determination
-          }//--End IF current week check
+                    arsort($totals);
+
+                    $top_score = max($totals);
+                    echo "\n<br>Sorted Totals array:<br>\n";
+                    print_r($totals);
+                    echo "\n<br>with a Top Score of $top_score<br>\n";
+
+                    if(count($totals) <= 1 ) {
+
+                    } elseif(current($totals) == next($totals)) { //there is a tie
+                        reset($totals);
+                        echo "<p>It's a tie!</p>\n";
+                        do { //remove the low scores
+                            if(current($totals) != $top_score) {
+                                array_pop($totals);
+                            }
+                        } while(next($totals));
+
+                        echo "<br>Possible winners after culling:<br>\n";
+                        print_r($totals);
+  
+                        echo "<br>Score Array:<br>\n";
+                        print_r($scores);
+
+                        if(isset($this_game_id)) {
+                            $game_score = getGameScore($this_game_id);
+                        } else {
+                            $game_score = 0;
+                        }
+                        echo "<br>Subtract Actual Game score of $game_score.<br>\n";
+          
+                        foreach($scores as $u => $s) {
+                            $score_diffs[$u] = abs($s - $game_score);
+                        }
+         
+                        echo "<br>Unsorted Score Differentials:<br>\n";
+                        print_r($score_diffs);
+                        asort($score_diffs);
+                        echo "<br>Sorted Score Differentials:<br>\n";
+                        print_r($score_diffs);
+                        $lowest_diff = max($score_diffs);
+                        echo "<br>with a Lowest Diff of $lowest_diff<br>\n";
+
+                        if(current($score_diffs) == next($score_diffs)) { //there is a another tie
+                            $winner = key($score_diffs); //flip a proverbial coin
+                            echo $winner." has won the second tie breaker through a random selection process.<br>\n";
+                            reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
+                            $season_wins[$winner] += 1;
+                            echo "<p>".print_r($season_wins)."</p>\n";
+                        } else {
+                            reset($score_diffs);
+                            $winner = key($score_diffs);
+                            echo $winner." has won the tie breaker with a score differential of $lowest_diff.<br>\n";
+                            reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
+                            $season_wins[$winner] += 1;
+                            echo "<p>".print_r($season_wins)."</p>\n";
+                        }
+
+                    } else {
+                        reset($totals);
+                        $winner = key($totals);
+                        echo $winner." has won on picks. ";
+                        //Reconcile weekly point total and flag winner in DB
+                        reconcileWinners($db,$winner,$user['group_id'],$season_year,$season_type,$week,$verbose=TRUE);
+                        $season_wins[$winner] += 1;
+                        echo "<p>".print_r($season_wins)."</p>\n";
+                    }//End Tie Determination
+                 }//--End IF current week check
+            } //reconcile
         }//--Week
-      }//End foreach Season
+      }//End foreach Season  
    }//END reconciliation check
    
     echo "</div>\n"; //end debug
@@ -277,6 +300,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         $i=0;
         foreach($season_wins as $u => $w) {
             $p = ($w / $total_weeks ) * 100;
+            $p =round($p);
             echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
             echo "\t<div class=\"progress-bar";
             if($i==0 && $p > 0) { echo " progress-bar-success"; }
@@ -345,8 +369,9 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
             <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">';
                     $first_kickoff_time_of_week = getFirstKickoffOfWeek($current_season_year,$current_season_type,$current_week);
+                    $last_week = $current_week -1;
                     if(strtotime($first_kickoff_time_of_week) > time()) {
-                        displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week-1);
+                        displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$last_week);
                     } else {
                         displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week);
                     }

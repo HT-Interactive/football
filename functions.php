@@ -300,6 +300,17 @@ function getFirstKickoffOfWeek($season_year,$season_type,$week) {
   $game = pg_fetch_array($result, null, PGSQL_ASSOC);
   return $game['start_time'];  
 }
+function allGamesFinished($season_year,$season_type,$week) {
+  $query = "SELECT * FROM game WHERE finished='f' AND season_year='$season_year' AND season_type='$season_type' AND week='$week'";
+  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+  $game = pg_fetch_array($result, null, PGSQL_ASSOC);
+  if(empty($result)) {
+      return TRUE;
+  } else {
+      return FALSE;   
+  }
+   
+}
 function getNumberOfGames($season_year,$season_type,$week) {
 
   $query = "SELECT COUNT(gsis_id) as num_games FROM game WHERE season_year='$season_year' AND season_type='$season_type' AND week='$week'";
@@ -323,11 +334,11 @@ function getWeeklyPoints($db,$user_id,$group_id,$season_year,$season_type,$week)
 
 function getWeeklyScore($db,$user_id,$group_id,$season_year,$season_type,$week) {
   //updatePoints($db,$user_id,$season_year,$season_type,$week);
-  $sql = "SELECT score,game_id,winner FROM picks WHERE user_id='$user_id' AND group_id='$group_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week' AND score IS NOT NULL"; 
+  $sql = "SELECT SUM(score) as sum_score,game_id,winner FROM picks WHERE user_id='$user_id' AND group_id='$group_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week' AND score IS NOT NULL"; 
   $result = mysqli_query($db,$sql);
   $row = mysqli_fetch_assoc($result);
-  if($row['score'] >= 0) {
-    return [$row['game_id'],$row['score'],$row['winner']];
+  if($row['sum_score'] >= 0) {
+    return [$row['game_id'],$row['sum_score'],$row['winner']];
   } else {
     return [$row['game_id'],NULL,NULL];
   }
