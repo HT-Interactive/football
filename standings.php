@@ -104,7 +104,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
 } //--End Function
 
 function displaySeasonStandings($db,$users,$season_year,$season_types,$current_week) {
-    global $this_group_id;
+  global $this_group_id;
   // create an invisible DIV to hold debugging info
   echo "<div id=\"DivSeasonDebugging\" style=\"display: none;\">\n";
 
@@ -117,11 +117,23 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
   $result = mysqli_query($db,$sql);
   $row_cnt = mysqli_num_rows($result);
   $row = mysqli_fetch_array($result,MYSQL_ASSOC);
-  
-   if(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
+   if($row_cnt == 0) { //nothing in DB so just set everyone to zero
+        echo '<h2>DB is Empty.</h2>\n';
+        print_r($row);
+        foreach($users as $user) {
+            $this_key = getUserNameFromId($db,$user['user_id']);
+            if(!array_key_exists($this_key,$season_wins)) {
+                $season_wins[$this_key] = 0;
+            }
+        }
+        echo "<p>Season Wins:";
+        print_r($season_wins);
+        echo "</p>\n";
+      
+   } elseif(!is_null($row['user_id'])) { // completely unreconiled db's show num_rows of 1 because of SELECT COUNT, so check that it is real
         //just build the $season_wins[$user_name] array from the previous DB Result
         $is_reconciled = TRUE;
-        echo '<h2>DB is Reconciled so using those results.</h2>\n';
+        echo '<h2>DB is Reconciled so using those results.</h2>';
         print_r($row);
         do { //add winnders
             $this_key = getUserNameFromId($db,$row['user_id']);
@@ -139,8 +151,8 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         print_r($season_wins);
         echo "</p>\n";
    } else {
-     $is_reconciled = FALSE;
-  
+      $is_reconciled = FALSE;
+      echo '<h2>Find Winners and Reconcile DB</h2>';
       foreach($users as $user) { //set each user to 0 wins
         $season_wins[$user['user_name']] = 0;
       }
@@ -260,50 +272,54 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
     //print_r($season_wins);
     //echo "<div style=\"border: 1px solid green;\">";
     echo "<div id=\"DivSeasonWins\">\n";
-    arsort($season_wins);
-    $i=0;
-    foreach($season_wins as $u => $w) {
-        $p = ($w / $total_weeks ) * 100;
-        echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
-        echo "\t<div class=\"progress-bar";
-        if($i==0 && $p > 0) { echo " progress-bar-success"; }
-        echo "\" role=\"progressbar\" aria-valuenow=\"$p\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $p%\">\n
-        $w ($w/$total_weeks, $p%)\n
-        </div>\n
-        </div>\n";
-        $i++;
-    }
-    echo "</div>\n";
+    if($total_weeks > 0) {
+        arsort($season_wins);
+        $i=0;
+        foreach($season_wins as $u => $w) {
+            $p = ($w / $total_weeks ) * 100;
+            echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
+            echo "\t<div class=\"progress-bar";
+            if($i==0 && $p > 0) { echo " progress-bar-success"; }
+            echo "\" role=\"progressbar\" aria-valuenow=\"$p\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $p%\">\n
+            $w ($w/$total_weeks, $p%)\n
+            </div>\n
+            </div>\n";
+            $i++;
+        }
+        echo "</div>\n";
 
-    echo "<div id=\"DivSeasonDollars\" style=\"position: absolute; visibility: hidden;\">\n";
-    // each user bar should go from -34 to max
-    //$i=0;
-    $anty = 2;
-    foreach($season_wins as $u => $w) {
-    //starting balance = weeks*anty
-    //total pot = users * weeks * anty
-    //winnings = (wins * users * anty) - (total_weeks*anty)
-    $starting_anty = $total_weeks * $anty;
-    $starting_balance = $starting_anty * -1;
-    $max_winnings = ($total_weeks * count($users) * $anty);
-    $max_balance = $max_winnings - $starting_anty;
-    $winnings = ($w * count($users) * $anty); 
-    $current_balance = $starting_balance + $winnings;
-    $winnings_p = ($winnings / $max_winnings ) * 100;
-    $break_even_p = ($starting_anty / $max_winnings ) * 100; 
-    echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
-    if($winnings_p > $break_even_p) { 
-        echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $break_even_p%\"></div>\n";
-        $whats_left = $winnings_p - $break_even_p;
-        echo "<div class=\"progress-bar progress-bar-success\" role=\"progressbar\" style=\"min-width: 2em; width: $whats_left%\">&#36;$current_balance</div>\n";
+        echo "<div id=\"DivSeasonDollars\" style=\"position: absolute; visibility: hidden;\">\n";
+        // each user bar should go from -34 to max
+        //$i=0;
+        $anty = 2;
+        foreach($season_wins as $u => $w) {
+        //starting balance = weeks*anty
+        //total pot = users * weeks * anty
+        //winnings = (wins * users * anty) - (total_weeks*anty)
+        $starting_anty = $total_weeks * $anty;
+        $starting_balance = $starting_anty * -1;
+        $max_winnings = ($total_weeks * count($users) * $anty);
+        $max_balance = $max_winnings - $starting_anty;
+        $winnings = ($w * count($users) * $anty); 
+        $current_balance = $starting_balance + $winnings;
+        $winnings_p = ($winnings / $max_winnings ) * 100;
+        $break_even_p = ($starting_anty / $max_winnings ) * 100; 
+        echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
+        if($winnings_p > $break_even_p) { 
+            echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $break_even_p%\"></div>\n";
+            $whats_left = $winnings_p - $break_even_p;
+            echo "<div class=\"progress-bar progress-bar-success\" role=\"progressbar\" style=\"min-width: 2em; width: $whats_left%\">&#36;$current_balance</div>\n";
+        } else {
+            echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $winnings_p%\">&#36;$current_balance</div>\n";
+        }
+        echo "</div>\n";
+        }
+        
+        //echo "</div>";
     } else {
-        echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $winnings_p%\">&#36;$current_balance</div>\n";
+        echo "<p>Season Standings will be available after the end of this week.</p>";  
     }
     echo "</div>\n";
-    }
-    echo "</div>\n";
-    //echo "</div>";
-    
 //calculateWinnings($users,$weeks,$wins,$anty)
 } //--End Function
 

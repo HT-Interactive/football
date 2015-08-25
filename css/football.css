@@ -42,6 +42,7 @@ body {
   font-size: medium;
   border: 1px solid DarkGray;
   border-radius: 4px;
+  cursor:  pointer;
 }
 .teamCell:hover,
 .teamCell.picked:hover,
@@ -54,18 +55,22 @@ body {
 .teamCell.away {
     text-align: right;
     padding-right:  2px;
+    cursor:  pointer;
 }
 .teamCell.home {
     text-align: left;
     padding-left:  2px;
+    cursor:  pointer;
 }
 .teamCell.picked {
     color:green;
     background-color:LightGray;
+    cursor:  pointer;
 }
 .teamCell.notPicked {
     color:black;
-    background-color:#eee
+    background-color:#eee;
+    cursor:  pointer;
 }
 .scoreCell {
   font-size: small;

@@ -134,14 +134,16 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
     $this_score = "";
   }
   if(!$can_pick) {
-    $onclick_away_str = "alert('Cant pick.')";
-    $onclick_home_str = "alert('Cant pick.')";
+    $onclick_away_str = "onclick=\"alert('Cant pick.')\"";
+    $onclick_home_str = "onclick=\"alert('Cant pick.')\"";
   } elseif($has_started && $timer_on) { // alert the user that it is too late
-    $onclick_away_str = "alert('It's too late to turn back now.')";
-    $onclick_home_str = "alert('It's too late to turn back now.')";
+    //$onclick_away_str = "data-toggle=\"popover\" data-trigger=\"focus\" data-content=\"It's too late to turn back now. The game has already started.\"";
+    //$onclick_home_str = "data-toggle=\"popover\" data-trigger=\"focus\" data-content=\"It's too late to turn back now. The game has already started.\"";
+    $onclick_away_str = "onclick=\"alert('Cant pick.')\"";
+    $onclick_home_str = "onclick=\"alert('Cant pick.')\"";
   } else { // add pickTeam script to element    
-    $onclick_away_str = "pickTeam(this,'".$this_user_id."','".$this_group_id."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_away_team."')";
-    $onclick_home_str = "pickTeam(this,'".$this_user_id."','".$this_group_id."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_home_team."')";
+    $onclick_away_str = "onclick=\"pickTeam(this,'".$this_user_id."','".$this_group_id."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_away_team."')\"";
+    $onclick_home_str = "onclick=\"pickTeam(this,'".$this_user_id."','".$this_group_id."','".$this_gsis_id."','".$this_season_year."','".$this_season_type."','".$this_week."','".$this_home_team."')\"";
   }
   if(!isset($result_str)) {
       $result_str = "not picked";
@@ -179,7 +181,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   echo "<tr>\n"; //start new row in table
 
 //Away Team Cell
-  echo "<td><div id=\"$this_gsis_id"."_away\" onclick=\"$onclick_away_str\" class=\"teamCell away $away_style\">$this_away_team</div></td>\n";
+  echo "<td><div id=\"$this_gsis_id"."_away\" $onclick_away_str class=\"teamCell away $away_style\">$this_away_team</div></td>\n";
 //Away Team Score
   echo "<td>";
   if($has_started) {
@@ -194,7 +196,7 @@ while ($games = pg_fetch_array($result, null, PGSQL_ASSOC)) {
   }
   echo "</td>\n";
 //Home Team Cell
-  echo "<td><div id=\"$this_gsis_id"."_home\" onclick=\"$onclick_home_str\" class=\"teamCell home $home_style\">$this_home_team</div></td>\n";
+  echo "<td><div id=\"$this_gsis_id"."_home\" $onclick_home_str class=\"teamCell home $home_style\">$this_home_team</div></td>\n";
 //Result Cell
   echo "<td class=\"glyphCell\">";
   if(isset($result_span) && $can_pick) {
