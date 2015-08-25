@@ -33,6 +33,11 @@ body {
   padding: 2px;
   vertical-align: middle;
 }
+.pickTable td.pickDay {
+    font-size: 16px;
+    font-weight: 600;
+    padding-top:  12px;
+}
 .teamCell {
   font-size: medium;
   border: 1px solid DarkGray;
