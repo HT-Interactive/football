@@ -122,6 +122,7 @@ body {
   min-width: 80px;
   float: left;
   text-align: right;
+  padding-right: 8px;
 }
 .form-signin {
   max-width: 330px;
