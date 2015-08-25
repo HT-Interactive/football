@@ -90,20 +90,9 @@ function pickTeam(element,user,group,game,year,type,week,winner) { //dom_element
     xmlhttp.send();
  
 }
-function reconcileDB() { //dom_element,user,group,game_id,year,type,week,winner
-/*
-    if(element.id == game+"_home") { // user picked home team
-        document.getElementById(game+"_home").style.color = "green";
-        document.getElementById(game+"_home").style.background = "LightGray";
-        document.getElementById(game+"_away").style.color = "black";
-        document.getElementById(game+"_away").style.background = "#eee";
-    } else { // user picked away team
-        document.getElementById(game+"_away").style.color = "green";
-        document.getElementById(game+"_away").style.background = "LightGray";
-        document.getElementById(game+"_home").style.color = "black";
-        document.getElementById(game+"_home").style.background = "#eee";
-    }
-*/ 
+
+function updateServer() { //dom_element,user,group,game_id,year,type,week,winner
+
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         /*

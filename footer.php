@@ -6,9 +6,9 @@
       	<p class="text-muted">
             <?php 
                 if(isset($this_user_id)) {
-                    echo '<span id="server_status" class="glyphicon glyphicon-refresh" aria-hidden="true" style="color: green;" onclick="reconcileDB()"></span>';        	
+                    echo '<span id="server_status" class="glyphicon glyphicon-refresh" aria-hidden="true" style="color: green;" onclick="updateServer()"></span>';        	
         	        echo 'Server Response: <span id="txtHint"></span>';
-                    include("reconcile_picks.php");
+                    //include("reconcile_picks.php");
                     echo '<br>';
         	        if(isset($this_user_name)) { 
         	          if(!$my_points) { $my_points = 0; }
