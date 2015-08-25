@@ -118,8 +118,71 @@ body {
   color: #333;
   background-color: #e7e7e7;
 }
+.comingSoon {
+    text-align:  right;
+    vertical-align: bottom;
+    height:  30px;
+    position:  absolute;
+    right: 0;
+    bottom:  0;
+    z-index: 1500;
+}
+.progress-table {
+    text-align:  right;
+    vertical-align: top;  
+    width: 100%;  
+}
+.progress-table th {
+    /* border: 1px solid black; */
+    font-size: 12px;
+    text-align: right;
+    vertical-align: middle; 
+}
+.progress-table td {
+    vertical-align: top;
+    /* border: 1px solid black; */
+}
+.progress-table th.winner {
+    text-align: center;
+    width: 80px;
+}
+.progress-table td.winner {
+    text-align: center;
+    width: 80px;
+    vertical-align: top;
+}
+.progress-table th.score {
+    text-align: center;
+    width: 60px;
+}
+.progress-table td.score {
+    text-align: center;
+    width: 60px;
+    vertical-align: top;
+}
+.progress-table th.user {
+    text-align: right;
+    width: 100px;
+    padding-right:  8px;
+}
+.progress-table td.user {
+    text-align: right;
+    width: 100px;
+    vertical-align: top;
+}
+.progress-table th.points {
+    text-align:  left;
+}
+.progress-table td.points {
+    text-align:  left;
+    vertical-align: middle;
+}
+.progress-table td {
+    text-align: right;
+    vertical-align: middle; 
+}
 .progress-label {
-  min-width: 80px;
+  min-width: 100px;
   float: left;
   text-align: right;
   padding-right: 8px;

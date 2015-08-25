@@ -35,13 +35,19 @@ function displayStandings($totals,$num_games,$units) {
 function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   $num_games = getNumberOfGames($season_year,$season_type,$week);
   $percentages = array();
+  $monday_kickoff_time = getMondayNightKickoff($season_year,$season_type,$week);
 
   foreach($users as $user) {
   
     $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
+    $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week); //returns array with score, gsis_id and winner
     $percentage = ($num_correct / $num_games) * 100;
     //$percentages[$user['user_name']] = $percentage; 
-    $totals[$user['user_name']] = $num_correct;
+    $this_key = $user['user_name'];
+    //$this_game_id = $score[0];
+    $totals[$this_key] = $num_correct; 
+    $scores[$this_key] = $score[1];
+    $winners[$this_key] = $score[2];
 
   }
   /*
@@ -59,18 +65,42 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   }*/
   arsort($totals);
   $i=0;
+  echo '
+  <table class="progress-table">
+    <tr>';
+    if(strtotime($monday_kickoff_time) < time()) { 
+        echo '<th class="winner">Monday Night Winner</th><th class="score">Score</th>'; 
+        echo '<th class="user">User</th><th class="points">Points</th></tr>';
+    }
+
   foreach($totals as $u => $n) {
-    echo "\n<div class=\"progress-label\">".$u."</div><div class=\"progress\">\n";
-    echo "\t<div class=\"progress-bar";
+
+      $length = ($n/$num_games)*100;
+      $total_str = "$n ($n/$num_games, $length%)";
+    echo '
+    <tr>';
+    if(strtotime($monday_kickoff_time) < time()) { echo '
+        <td class="winner">'.$winners[$u].'</td>
+        <td class="score">'.$scores[$u].'</td>';
+    }
+    echo '
+        <td class="user">
+            <div class="progress-label">'.substr($u,0,12).'</div>
+        </td>
+        <td class="points">
+            <div class="progress">
+                <div class="progress-bar';
     if($i==0 && $n > 0) { echo " progress-bar-success"; }
-    $length = ($n/$num_games)*100;
-    echo "\" role=\"progressbar\" aria-valuenow=\"$length\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $length%;\">\n
-    $n ($n/$num_games, $length%)\n
-    </div>\n
-    </div>\n";
+    echo '" role="progressbar" aria-valuenow="'.$length.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: '.$length.'%;">'
+                    .$total_str.
+                '</div>
+            </div>
+        </td>
+    </tr>';
     $i++;
   }
-
+  echo '</table>';
+  
 } //--End Function
 
 function displaySeasonStandings($db,$users,$season_year,$season_types,$current_week) {
@@ -234,7 +264,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
     $i=0;
     foreach($season_wins as $u => $w) {
         $p = ($w / $total_weeks ) * 100;
-        echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">\n";
+        echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
         echo "\t<div class=\"progress-bar";
         if($i==0 && $p > 0) { echo " progress-bar-success"; }
         echo "\" role=\"progressbar\" aria-valuenow=\"$p\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"min-width: 2em; width: $p%\">\n
@@ -261,7 +291,7 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
     $current_balance = $starting_balance + $winnings;
     $winnings_p = ($winnings / $max_winnings ) * 100;
     $break_even_p = ($starting_anty / $max_winnings ) * 100; 
-    echo "<div class=\"progress-label\">".$u."</div><div class=\"progress\">\n";
+    echo "<div class=\"progress-label\">".substr($u,0,12)."</div><div class=\"progress\">\n";
     if($winnings_p > $break_even_p) { 
         echo "<div class=\"progress-bar progress-bar-danger\" role=\"progressbar\" style=\"min-width: 2em; width: $break_even_p%\"></div>\n";
         $whats_left = $winnings_p - $break_even_p;
@@ -298,7 +328,12 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
             </div>
             <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">';
-                    displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week);
+                    $first_kickoff_time_of_week = getFirstKickoffOfWeek($current_season_year,$current_season_type,$current_week);
+                    if(strtotime($first_kickoff_time_of_week) > time()) {
+                        displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week-1);
+                    } else {
+                        displayWeeklyStandings($db,$users,$current_season_year,$current_season_type,$current_week);
+                    }
     echo '
                 </div>
                 <div class="panel-footer"></div>
@@ -398,12 +433,12 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
         //$wins[] = getWeeklyWinner($db,$this_season_year,$display_type,$display_week);
         echo '
         <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingWeek'.$display_week.'">
+            <div class="panel-heading" role="tab" id="headingWeek'.$display_type.$display_week.'">
                 <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWeek'.$display_week.'" aria-expanded="true" aria-controls="collapseWeek'.$display_week.'">Week '.$display_week.' <small>('.$display_type.' '.$this_season_year.')</small></a>
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseWeek'.$display_type.$display_week.'" aria-expanded="true" aria-controls="collapseWeek'.$display_type.$display_week.'">Week '.$display_week.' <small>('.$display_type.' '.$this_season_year.')</small></a>
                 </h4>
             </div>
-            <div id="collapseWeek'.$display_week.'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div id="collapseWeek'.$display_type.$display_week.'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">';
                     displayWeeklyStandings($db,$users,$this_season_year,$display_type,$display_week);
         echo '
@@ -415,9 +450,10 @@ function displaySeasonStandings($db,$users,$season_year,$season_types,$current_w
       }
       $i++;
     }
-    echo '
-    </div><!--Panel Group -->';
+
   }
+  echo '
+  </div><!--Panel Group -->';
 
 //--Main Footer
 include 'footer.php';

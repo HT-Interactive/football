@@ -286,7 +286,20 @@ function getGameScore($game_id) {
   return $game['home_score'] + $game['away_score'];
 
 }
-
+function getMondayNightKickoff($season_year,$season_type,$week) {
+   // Performing SQL query
+  $query = "SELECT start_time FROM game WHERE day_of_week='Monday' AND season_year='$season_year' AND season_type='$season_type' AND week='$week' ORDER BY start_time DESC";
+  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+  $game = pg_fetch_array($result, null, PGSQL_ASSOC);
+  return $game['start_time'];  
+}
+function getFirstKickoffOfWeek($season_year,$season_type,$week) {
+   // Performing SQL query
+  $query = "SELECT start_time FROM game WHERE season_year='$season_year' AND season_type='$season_type' AND week='$week' ORDER BY start_time ASC";
+  $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+  $game = pg_fetch_array($result, null, PGSQL_ASSOC);
+  return $game['start_time'];  
+}
 function getNumberOfGames($season_year,$season_type,$week) {
 
   $query = "SELECT COUNT(gsis_id) as num_games FROM game WHERE season_year='$season_year' AND season_type='$season_type' AND week='$week'";
@@ -310,13 +323,13 @@ function getWeeklyPoints($db,$user_id,$group_id,$season_year,$season_type,$week)
 
 function getWeeklyScore($db,$user_id,$group_id,$season_year,$season_type,$week) {
   //updatePoints($db,$user_id,$season_year,$season_type,$week);
-  $sql = "SELECT score,game_id FROM picks WHERE user_id='$user_id' AND group_id='$group_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week' AND score IS NOT NULL"; 
+  $sql = "SELECT score,game_id,winner FROM picks WHERE user_id='$user_id' AND group_id='$group_id' AND season_year='$season_year' AND season_type='$season_type' AND week='$week' AND score IS NOT NULL"; 
   $result = mysqli_query($db,$sql);
   $row = mysqli_fetch_assoc($result);
   if($row['score'] >= 0) {
-    return [$row['game_id'],$row['score']];
+    return [$row['game_id'],$row['score'],$row['winner']];
   } else {
-    return [$row['game_id'],NULL];
+    return [$row['game_id'],NULL,NULL];
   }
 }
 

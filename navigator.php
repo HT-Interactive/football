@@ -19,8 +19,11 @@
   					if(isset($this_user_name)) {
             	echo '<li '.(($SITE_PAGE == 'picks') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'picks.php">My Picks</a></li>';
             	echo '<li '.(($SITE_PAGE == 'standings') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'standings.php">Standings</a></li>';
-            	echo '<li '.(($SITE_PAGE == 'forum') ? 'class="active"':'').'><a href="'.$SITE_ROOT.'forum.php">Forum</a></li>';
-            	echo '<li><a href="#"><img width="20" alt="Former Clemson Player Stats" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Clemson_University_Tiger_Paw_logo.svg/32px-Clemson_University_Tiger_Paw_logo.svg.png"/> Stats</a></li>';
+                echo '<li '.(($SITE_PAGE == 'forum') ? 'class="active"':'').'><img src="coming_soon_ribbon.png" class="comingSoon"><a href="'.$SITE_ROOT.'forum.php">Forum</a></li>';
+                //echo '<li '.(($SITE_PAGE == 'forum') ? 'class="active"':'').'><img src="coming_soon_ribbon.png" class="comingSoon"><a href="#">Forum</a></li>';
+            	echo '<li><img src="coming_soon_ribbon.png" class="comingSoon"><a href="#"><img width="20" alt="Former Clemson Player Stats" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Clemson_University_Tiger_Paw_logo.svg/32px-Clemson_University_Tiger_Paw_logo.svg.png"/> Stats</a></li>';
+
+            	//echo '<li><a href="#"><img width="20" alt="Former Clemson Player Stats" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Clemson_University_Tiger_Paw_logo.svg/32px-Clemson_University_Tiger_Paw_logo.svg.png"/> Stats</a></li>';
             }
           ?>
             <?php if($SITE_PAGE == 'login') { echo '<li class="active"><a href="'.$SITE_ROOT.'index.php?action=login">Sign In</a></li>'; } ?>
