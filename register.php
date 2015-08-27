@@ -53,7 +53,7 @@
     } else { 
     
         // make user user name isn't already registered 
-        $sql = "SELECT * FROM users WHERE user_name='".mysql_real_escape_string($user_name)."'";
+        $sql = "SELECT * FROM users WHERE user_name='".$user_name."'";
     		$result = mysqli_query($db, $sql);
     		if(mysqli_num_rows($result) > 0) { // user already registered so redirect back to login with message
     			$user = mysqli_fetch_array($result);
