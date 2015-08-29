@@ -45,17 +45,16 @@ while($user_pick = mysqli_fetch_array($pick_result)) {
             $winning_team = $game['away_team'];
         }
 
-        if($winning_team == $user_winner) {
-            //pick correct
-            addPoint($db,$user_pick_id,1,FALSE);
-            updatePoints($db,$user_user_id,$user_group_id,$user_season_year,$user_season_type,$user_week,false);
-        } else { 
-            //($winning_team != $user_winner || $winning_team == 'tied') 
-            addPoint($db,$user_pick_id,0,FALSE);
-            updatePoints($db,$user_user_id,$user_group_id,$user_season_year,$user_season_type,$user_week,false);
-        }
-
         if($has_finished) {
+            if($winning_team == $user_winner) {
+                //pick correct
+                addPoint($db,$user_pick_id,1,FALSE);
+                updatePoints($db,$user_user_id,$user_group_id,$user_season_year,$user_season_type,$user_week,false);
+             } else { 
+                //($winning_team != $user_winner || $winning_team == 'tied') 
+                addPoint($db,$user_pick_id,0,FALSE);
+                updatePoints($db,$user_user_id,$user_group_id,$user_season_year,$user_season_type,$user_week,false);
+             }
             //reconcile to prevent future changes
             $sql = "UPDATE picks SET reconciled=1 WHERE pick_id='$user_pick_id'";
             if(mysqli_query($db,$sql)) {
