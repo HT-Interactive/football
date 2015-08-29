@@ -32,6 +32,7 @@
     <!-- <script src="https://smalldo.gs/js/countdown.js"></script> -->
     <script src="js/countdown.min.js"></script>
     <script src="js/football.js"></script>
+    <script src="js/holder.js"></script>
 
   </head>
 

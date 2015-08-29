@@ -562,5 +562,22 @@ function calculateWinnings($users,$weeks,$wins,$anty) {
   //winnings = (wins * users * anty) - (total_weeks*anty)
   return ($wins * count($users) * $anty) - ($weeks * $anty);
 }
+//--**Stats functions
+function getClemsonPassingStats($season_year,$season_type) {
+    $sql = 'SELECT player.full_name, player.position, player.team,
+            SUM(play_player.passing_att) AS passing_att,
+            SUM(play_player.passing_cmp) AS passing_cmp,
+            SUM(play_player.passing_yds) AS passing_yds,
+            SUM(play_player.passing_tds) AS passing_tds
+            FROM play_player
+            LEFT JOIN player ON player.player_id = play_player.player_id
+            LEFT JOIN game ON game.gsis_id = play_player.gsis_id
+            WHERE game.season_year = '.$season_year.' AND game.season_type = \''.$season_type.'\' AND player.college =\'Clemson\' AND player.status=\'Active\'
+            GROUP BY player.full_name, player.position, player.team
+            HAVING SUM(play_player.passing_yds) > 0
+            ORDER BY player.position DESC';
+    $result = pg_query($sql) or die('Query failed: ' . pg_last_error());
+    return pg_fetch_all($result);
+}
 
 ?>
