@@ -71,6 +71,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   }*/
   arsort($totals);
   $i=0;
+  $last_total = 0;
   echo '
   <table class="progress-table">
     <tr>';
@@ -97,7 +98,12 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
         <td class="points">
             <div class="progress">
                 <div class="progress-bar';
-    if($i==0 && $n > 0) { echo " progress-bar-success"; }
+    if($n > 0) {
+        if($i==0 || $n == $last_total) {
+            echo " progress-bar-success"; 
+            $last_total = $n;        
+        }
+    }
     echo '" role="progressbar" aria-valuenow="'.$length.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: '.$length.'%;">'
                     .$total_str.
                 '</div>
@@ -105,6 +111,7 @@ function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
         </td>
     </tr>';
     $i++;
+    
   }
   echo '</table>';
   
