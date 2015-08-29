@@ -17,10 +17,15 @@ if(isset($_REQUEST['winner'])) {
   $this_winner = NULL;
 }
 if(isset($_REQUEST['score'])) {
-  $this_score = $_REQUEST['score'];
+    if($_REQUEST['score'] == '') {
+        $this_score = 'NULL';
+    } else {
+        $this_score = $_REQUEST['score'];
+    }
 } else {
-  $this_score = NULL;
+  $this_score = 'NULL';
 }
+echo "score ".$this_score;
 
 $pick_result = mysqli_query($db, "SELECT * FROM picks WHERE game_id='$this_game_id' AND user_id='$this_user_id' AND group_id='$this_group_id'");
 
@@ -54,7 +59,12 @@ if($this_pick = mysqli_fetch_array($pick_result)) { // User has already picked s
   
 
 } else { //first pick so add it to db and create point holder for week
-  $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points,reconciled) VALUES (NULL,'$this_group_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner','$this_score',NULL,NULL)";
+    if($this_score == 'NULL') {
+        $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points,reconciled) VALUES (NULL,'$this_group_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner',NULL,NULL,NULL)";
+ 
+    } else {
+       $sql = "INSERT INTO picks (pick_id, group_id, game_id, season_year, season_type, week, user_id, winner, score, points,reconciled) VALUES (NULL,'$this_group_id','$this_game_id','$this_season_year','$this_season_type','$this_week','$this_user_id','$this_winner','$this_score',NULL,NULL)";   
+    }
   if(mysqli_query($db, $sql)) {
     echo "Pick $this_winner entered";
   } else {

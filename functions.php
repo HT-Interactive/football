@@ -13,6 +13,55 @@ function getUserNameFromId($db,$user_id) {
     $result = mysqli_query($db, $sql) or die(mysqli_error_list($db));
     return $row = mysqli_fetch_array($result)['user_name'];
 }
+function getUserEmailFromId($db,$user_id) {
+    $sql = "SELECT user_email FROM users WHERE user_id='$user_id'";
+    $result = mysqli_query($db, $sql) or die(mysqli_error_list($db));
+    return $row = mysqli_fetch_array($result)['user_email'];
+}
+function notifyUser($email,$name,$num_games,$num_picks) {
+	global $SITE_HOST, $BASE_DIR;
+	
+	$to  = $email;
+    $subject = 'Football Pick Reminder';
+
+  // message
+  $message = '
+  <html>
+  <head>
+    <title>'.$subject.'</title>
+  </head>
+  <body>
+    <p>
+        Dear '.$name.',
+    </p>
+    <p>
+        Our official pick selection authenticators have noticed that you have only selected '.$num_picks.' of '.$num_games.' this week. Please <a href="http://'.$SITE_HOST.'/'.$BASE_DIR.'/picks.php">login to the site</a> to complete your pick selection.
+    </p>
+    <p>
+        Sincerely,<br>
+        Evose Football Mangement Team
+    </p>
+  </body>
+  </html>
+  ';
+
+  // To send HTML mail, the Content-type header must be set
+  $headers  = 'MIME-Version: 1.0' . "\r\n";
+  $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
+  // Additional headers
+  $headers .= 'From: Evose Football <football@evose.com>' . "\r\n";
+  $headers .= 'Cc: tim.wiater@us.michelin.com' . "\r\n";
+  //$headers .= 'Bcc: birthdaycheck@example.com' . "\r\n";
+
+  // Mail it
+  if(mail($to, $subject, $message, $headers)) {
+  	echo 'Mail sent.';
+  } else {
+  	echo 'Mail Error';
+  }
+}
+
 function guessCurrentWeek() {
   global $current_season_year, $current_season_type, $current_week, $this_season_year, $this_season_type, $this_week, $this_group_id, $this_user_id, $this_default_group;
 // Guess Current Week
