@@ -13,7 +13,11 @@ include("header.php");
 //--END SITE HEADER
 
 //Turn off timer for testing
-$timer_on = TRUE;
+if($this_group_id == 1) {
+    $timer_on = FALSE;
+} else {
+    $timer_on = TRUE;
+}
 
 // Performing SQL query for correct week
 $query = "SELECT * FROM game WHERE season_year='$this_season_year' AND season_type='$this_season_type' AND week='$this_week' ORDER BY start_time ASC";

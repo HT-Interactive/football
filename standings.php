@@ -35,12 +35,18 @@ function displayStandings($totals,$num_games,$units) {
 function displayWeeklyStandings($db,$users,$season_year,$season_type,$week) {
   $num_games = getNumberOfGames($season_year,$season_type,$week);
   $percentages = array();
-  $monday_kickoff_time = getMondayNightKickoff($season_year,$season_type,$week);
+  //$monday_night = getMondayNight($season_year,$season_type,$week);
+  $monday_night_game_id = getMondayNightGame($season_year,$season_type,$week);
+  $monday_kickoff_time = getMondayNightKickoffTime($monday_night_game_id);
+  //echo 'Monday Night game '.$monday_night_game_id.' Kick Time '.$monday_kickoff_time;
+   
 
   foreach($users as $user) {
   
     $num_correct = getWeeklyPoints($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week);
-    $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$season_year,$season_type,$week); //returns array with score, gsis_id and winner
+    $score = getWeeklyScore($db,$user['user_id'],$user['group_id'],$monday_night_game_id); //returns array with score, gsis_id and winner
+   // $score = getGameScore($monday_night_game_id);
+    //$winner = getMondayNightWinner($monday_night_game_id);
     $percentage = ($num_correct / $num_games) * 100;
     //$percentages[$user['user_name']] = $percentage; 
     $this_key = $user['user_name'];
